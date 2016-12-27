@@ -1,0 +1,194 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.evoke.zenforce.view.fragment.ActivitiesFragment">
+
+
+
+    <LinearLayout
+        android:id="@+id/timer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_margin="4dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
+            android:elevation="12dp">
+
+            <RelativeLayout
+                android:id="@+id/rlTimer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white">
+
+
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="00:00"
+                    android:textColor="@color/launch_primary"
+                    android:textSize="24sp"
+                    android:visibility="visible" />
+
+                <!--<ImageView
+                    android:id="@+id/imgStartTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:adjustViewBounds="true"
+                    android:paddingTop="24dp"
+                    android:src="@drawable/ic_timer_black_36dp" />-->
+
+                <TextView
+                    android:id="@+id/tvTimerTitle"
+                    style="@style/Activities_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/launch_primary_dark"
+                    android:layout_below="@+id/tvTimer"
+                    android:text="@string/start_visit" />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
+            android:elevation="4dp">
+
+            <RelativeLayout
+                android:id="@+id/rlPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <!--<ImageView
+                    android:id="@+id/imgPhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_photo_camera_black_36dp" />-->
+
+
+
+                <TextView
+                    android:id="@+id/tvPhoto"
+                    style="@style/Activities_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:drawableTop="@drawable/camera_96"
+                    android:layout_marginTop="20dp"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/launch_primary_dark"
+                    android:text="@string/take_a_photo" />
+
+                <ImageView
+                    android:id="@+id/imgUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/upload_56"
+                    android:adjustViewBounds="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="30dp"
+                    android:visibility="invisible"/>
+
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
+            android:elevation="4dp">
+
+            <RelativeLayout
+                android:id="@+id/rlNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+
+                <TextView
+                    android:id="@+id/tvNote"
+                    style="@style/Activities_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:drawableTop="@drawable/note_96"
+                    android:layout_marginTop="20dp"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/launch_primary_dark"
+                    android:text="@string/take_a_note" />
+
+
+                <ImageView
+                    android:id="@+id/imgNoteUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/upload_56"
+                    android:adjustViewBounds="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="30dp"
+                    android:visibility="invisible"/>
+
+
+
+                <!--<ImageView
+                    android:id="@+id/imgNoteUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/upload"
+                    android:adjustViewBounds="true"
+                    android:paddingTop="16dp"
+                    android:layout_toRightOf="@+id/imgAddNote"
+                    android:visibility="invisible"/>
+
+
+                <ImageView
+                    android:id="@+id/imgAddNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:adjustViewBounds="true"
+                    android:paddingTop="24dp"
+                    android:src="@drawable/ic_note_black_36dp" />
+
+
+                <TextView
+                    android:id="@+id/tvNote"
+                    style="@style/Activities_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/imgAddNote"
+                    android:layout_marginTop="20dp"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/launch_primary_dark"
+                    android:text="@string/take_a_note" />-->
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

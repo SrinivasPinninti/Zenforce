@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".view.activity.TestActivity">
+
+    <!--<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="simple_chip"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black" />
+
+    <com.evoke.zenforce.view.custom.ChipView
+        android:id="@+id/chip_simple"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="hint_chip"
+        android:background="@android:color/darker_gray"
+        android:padding="5dp"
+        android:textSize="20sp" />-->
+
+   <!-- <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="custom_chip_background"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black" />-->
+
+    <com.evoke.zenforce.view.custom.ChipView
+        android:id="@+id/chip_custom_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_edittext"
+        android:padding="5dp"
+        android:textSize="16sp" />
+
+   <!-- <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="custom_chip_layout"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black" />
+
+    <com.evoke.zenforce.view.custom.ChipView
+        android:id="@+id/chip_custom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="hint_chip"
+        android:padding="5dp"
+        android:textSize="20sp" />-->
+
+  <!--  <Button
+        android:id="@+id/btn_getChips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="get_chips" />-->
+</LinearLayout>

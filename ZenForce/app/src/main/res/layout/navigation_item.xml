@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:paddingRight="16dp"
+    android:orientation="horizontal">
+
+    <View
+        android:id="@+id/view_color"
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_red_light"/>
+
+    <ImageView
+        android:id="@+id/nav_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:src="@drawable/today_black_24dp"/>
+    
+    
+    <TextView
+        android:id="@+id/item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Today"
+        style="@style/NavItemStyle"
+        />
+
+</LinearLayout>

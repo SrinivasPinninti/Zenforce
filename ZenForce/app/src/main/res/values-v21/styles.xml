@@ -1,0 +1,50 @@
+<resources>
+
+    <!--<style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>-->
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="AppTheme.Base">
+        <!-- Customize your theme here. -->
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@android:color/white</item>
+
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+    </style>
+
+    <style name="AppTheme.MyPlace" parent="AppTheme.Base">
+    <item name="android:colorPrimary">@color/launch_primary</item>
+    <item name="android:colorPrimaryDark">@color/launch_primary_dark</item>
+    <item name="android:colorAccent">@color/launch_accent</item>
+    <item name="android:textColorPrimary">@color/launch_primary_text</item>
+    <item name="android:textColorSecondary">@color/launch_secondary_text</item>
+    <item name="android:icon">@color/launch_icons</item>
+    <item name="android:divider">@color/launch_divider</item>
+
+        <item name="android:colorControlNormal">#c5c5c5</item>
+        <item name="android:colorControlActivated">@color/launch_primary</item>
+        <item name="android:colorControlHighlight">@color/launch_primary</item>
+
+        <item name="android:actionMenuTextColor">@color/white</item>
+
+    </style>
+
+    <style name="DialogTheme" parent="android:Theme.Dialog">
+
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+
+
+        <!-- No backgrounds, titles or window float -->
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+</resources>
