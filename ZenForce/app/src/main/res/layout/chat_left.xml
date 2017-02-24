@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:gravity="left"
+    android:orientation="horizontal"
+    android:weightSum="10">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:layout_margin="4dp">
+
+    <ImageView
+        android:id="@+id/imgChat"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/chat_image2" />
+
+        <ImageView
+            android:id="@+id/imgResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/not_sent_48"
+            android:layout_marginTop="12dp"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/imgChat"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="7.5"
+        android:gravity="left">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingLeft="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="8dp"
+        android:background="@drawable/shape_bg_incoming_bubble">
+
+        <TextView
+            android:id="@+id/timeStamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Feb 7 9:30 pm"
+            android:textSize="12sp"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/txtMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/timeStamp"
+            android:layout_alignLeft="@+id/timeStamp"
+            android:text="Both Ms Sasikala and Jayalalithaa were convicted of corruption charges. They were later acquitted, but the Supreme Court is expected to pronounce verdict on the acquittal within a week"
+            android:textSize="16sp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"></View>
+
+    <!--<ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/chat_admin"
+        android:paddingTop="12dp"/>
+
+    <TextView
+        android:id="@+id/txtMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_bg_incoming_bubble"
+        android:layout_marginLeft="40dp"
+        android:padding="24dp"
+        android:text="You have to move the portion of the background task that updates the ui onto the ... ViewRoot$CalledFromWrongThreadException: Only the original thread that "
+        android:textColor="@color/white"
+        android:textSize="16dp" />-->
+
+
+</LinearLayout>

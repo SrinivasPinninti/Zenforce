@@ -1,0 +1,108 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/chat_background"
+    android:orientation="vertical">
+    <include layout="@layout/app_bar"></include>
+
+    <ListView
+        android:id="@+id/list_view_messages"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:divider="@null"
+        android:stackFromBottom="true"
+        android:transcriptMode="alwaysScroll"></ListView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:elevation="10dp">
+
+
+        <EditText
+            android:id="@+id/epUiETNewNotes"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="80dp"
+            android:layout_centerVertical="true"
+            android:hint="Type a message"
+            android:inputType="text"
+            android:paddingLeft="10dp"
+            android:singleLine="true"
+            android:textSize="14sp"
+            android:textColor="@color/dark_grey"
+            android:background="#00000000"></EditText>
+
+
+        <ImageView
+            android:id="@+id/uiIVEnter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/epUiETNewNotes"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/epUiETNewNotes"
+            android:layout_margin="15dp"
+            android:src="@drawable/ic_action_send"
+            android:visibility="gone" />
+
+        <!--<ImageView
+            android:id="@+id/uiIVSpk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/uiETNewNotes"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/uiETNewNotes"
+            android:layout_margin="10dp"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:visibility="visible" />-->
+
+        <android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/uiFabSpk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:layout_centerVertical="true"
+            android:elevation="10dp"
+            android:src="@drawable/ic_action_microphone"
+            android:visibility="visible"
+            app:borderWidth="0dp"
+            app:fabSize="mini"
+            app:rippleColor="@android:color/darker_gray" />
+
+    </RelativeLayout>
+
+
+
+   <!-- <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true" >
+
+        <EditText
+            android:id="@+id/et_chatMsg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:inputType="textCapSentences"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="send"/>
+
+    </LinearLayout>-->
+
+
+</LinearLayout>
