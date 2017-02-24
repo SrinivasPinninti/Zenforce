@@ -34,6 +34,25 @@
 
     </style>
 
+
+    <!--<style name="AppTheme.Today" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/today_primary</item>
+        <item name="colorPrimaryDark">@color/today_primary_dark</item>
+        <item name="colorAccent">@color/today_accent</item>
+        <item name="icon">@color/today_icons</item>
+        <item name="divider">@color/today_divider</item>
+
+        <item name="colorControlNormal">#c5c5c5</item>
+        <item name="colorControlActivated">@color/today_primary</item>
+        <item name="colorControlHighlight">@color/today_primary</item>
+
+        &lt;!&ndash; <item name="textColorPrimary">@color/launch_primary_text</item>
+         <item name="textColorSecondary">@color/launch_secondary_text</item>&ndash;&gt;
+
+        <item name="actionMenuTextColor">@color/white</item>
+
+    </style>-->
+
     <!-- Base application theme. -->
    <!-- <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         &lt;!&ndash; Customize your theme here. &ndash;&gt;

@@ -26,4 +26,10 @@ public class Constants {
     public static final String TYPE = "restaurant";
     public static final String TYPES = "geocode";
 
+
+    public static final String BROADCAST_ACTION_OFFLINE_MSG = "Offline_messages";
+    public static final String BROADCAST_ACTION_RECEIVED_MSG = "Received_messages";
+
+
+
 }

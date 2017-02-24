@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.evoke.zenforce.R;
-import com.evoke.zenforce.model.database.beanentity.VisitBean;
+import com.evoke.zenforce.model.database.beanentity.PlaceBean;
 import com.evoke.zenforce.view.activity.VisitActivity;
 
 import java.util.List;
@@ -23,12 +23,12 @@ public class VisitedPlacesListAdapter extends RecyclerView.Adapter<VisitedPlaces
 
 
     private static final String TAG = "VisitedListAdapter";
-    private List<VisitBean> mResultList;
+    private List<PlaceBean> mResultList;
     private Context mContext;
 
 
 
-    public VisitedPlacesListAdapter(Context context, List<VisitBean> resultList) {
+    public VisitedPlacesListAdapter(Context context, List<PlaceBean> resultList) {
         mContext = context;
         mResultList = resultList;
     }
@@ -65,15 +65,15 @@ public class VisitedPlacesListAdapter extends RecyclerView.Adapter<VisitedPlaces
             address   = (TextView) itemView.findViewById(R.id.tvPlaceAddress);
 
         }
-        public void bindView(final VisitBean visit) {
-            placeName.setText(visit.getName());
-            address.setText(visit.getAddress());
+        public void bindView(final PlaceBean place) {
+            placeName.setText(place.getName());
+            address.setText(place.getAddress());
             mItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Log.v(TAG, " call VisitActivity...." );
                     Intent myPlacesIntent = new Intent(mContext, VisitActivity.class);
-                    myPlacesIntent.putExtra("visitBean", visit);
+                    myPlacesIntent.putExtra("placeBean", place);
                     myPlacesIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     mContext.startActivity(myPlacesIntent);
                 }

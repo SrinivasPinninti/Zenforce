@@ -7,6 +7,9 @@ import android.util.Log;
 
 import com.evoke.zenforce.model.database.DbConstants.VisitTable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by spinninti on 11/23/2016.
  */
@@ -14,17 +17,29 @@ public class VisitBean extends BaseEntityBean implements Parcelable{
 
     private long    _ID;
 
-    private String  name;
-    private String  address;
-    private String  phone;
-    private String  website;
-    private String  locationId;
-    private String  locationLat;
-    private String  locationLng;
-    private int     timeStamp;
+    private long   placeId;
+    private String name;
+    private String address;
+    private long   start_time;
+    private long   end_time;
+    private String imagePath;
+    private int    imageCount;
+    private String note;
+    private int    noteCount;
+
+
+    private PhotoEntityBean photoEntityBean;
+
+    private List<PhotoEntityBean> photos = new ArrayList<>();
+
+    private long   timeStamp;
+    private long photoId;
+
+
+
+    private PhotoEntityBean photo;
 
     private ContentValues values;
-
 
 
 
@@ -35,10 +50,7 @@ public class VisitBean extends BaseEntityBean implements Parcelable{
 
     protected VisitBean(Parcel in) {
         _ID = in.readLong();
-        name = in.readString();
-        address = in.readString();
-        locationId = in.readString();
-        timeStamp = in.readInt();
+        timeStamp = in.readLong();
         values = in.readParcelable(ContentValues.class.getClassLoader());
     }
 
@@ -63,10 +75,7 @@ public class VisitBean extends BaseEntityBean implements Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(_ID);
-        dest.writeString(name);
-        dest.writeString(address);
-        dest.writeString(locationId);
-        dest.writeInt(timeStamp);
+        dest.writeLong(timeStamp);
         dest.writeParcelable(values, flags);
     }
 
@@ -82,7 +91,14 @@ public class VisitBean extends BaseEntityBean implements Parcelable{
         values.put(VisitTable.COLUMN_ID, _ID);
     }
 
+    public long getPlaceId() {
+        return values.getAsLong(VisitTable.COLUMN_PLACE_ID);
+    }
 
+    public void setPlaceId(long placeId) {
+        this.placeId = placeId;
+        values.put(VisitTable.COLUMN_PLACE_ID, placeId);
+    }
 
     public String getName() {
         return values.getAsString(VisitTable.COLUMN_NAME);
@@ -102,60 +118,94 @@ public class VisitBean extends BaseEntityBean implements Parcelable{
         values.put(VisitTable.COLUMN_ADDRESS, address);
     }
 
-    public String getPhone() {
-        return values.getAsString(VisitTable.COLUMN_PHONE);
+
+
+
+    public long getStart_time() {
+        return values.getAsLong(VisitTable.COLUMN_START_TIME);
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-        values.put(VisitTable.COLUMN_PHONE, phone);
+    public void setStart_time(long start_time) {
+        this.start_time = start_time;
+        values.put(VisitTable.COLUMN_START_TIME, start_time);
     }
 
-    public String getWebsite() {
-        return values.getAsString(VisitTable.COLUMN_WEBSITE);
+    public long getEnd_time() {
+        return values.getAsLong(VisitTable.COLUMN_END_TIME);
     }
 
-    public void setWebsite(String website) {
-        this.website = website;
-        values.put(VisitTable.COLUMN_WEBSITE, website);
+    public void setEnd_time(long end_time) {
+        this.end_time = end_time;
+        values.put(VisitTable.COLUMN_END_TIME, end_time);
     }
 
-    public String getLocationId() {
-        return values.getAsString(VisitTable.COLUMN_LOCATION_ID);
+
+    public String getImagePath() {
+        return values.getAsString(VisitTable.COLUMN_IMG_PATH);
     }
 
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
-        values.put(VisitTable.COLUMN_LOCATION_ID, locationId);
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+        values.put(VisitTable.COLUMN_IMG_PATH, imagePath);
     }
 
-    public String getLocationLat() {
-        return values.getAsString(VisitTable.COLUMN_LOCATION_LAT);
+    public int getImageCount() {
+        return values.getAsInteger(VisitTable.COLUMN_IMG_COUNT);
     }
 
-    public void setLocationLat(String locationLat) {
-        this.locationLat = locationLat;
-        values.put(VisitTable.COLUMN_LOCATION_LAT, locationLat);
+    public void setImageCount(int imageCount) {
+        this.imageCount = imageCount;
+        values.put(VisitTable.COLUMN_IMG_COUNT, imageCount);
     }
 
-    public String getLocationLng() {
-        return values.getAsString(VisitTable.COLUMN_LOCATION_LNG);
+    public String getNote() {
+        return values.getAsString(VisitTable.COLUMN_NOTE);
     }
 
-    public void setLocationLng(String locationLng) {
-        this.locationLng = locationLng;
-        values.put(VisitTable.COLUMN_LOCATION_LNG, locationLng);
+    public void setNote(String note) {
+        this.note = note;
+        values.put(VisitTable.COLUMN_NOTE, note);
     }
 
-    public int getTimeStamp() {
-        return values.getAsInteger(VisitTable.COLUMN_TIMESTAMP);
+    public int getNoteCount() {
+        return values.getAsInteger(VisitTable.COLUMN_NOTE_COUNT);
     }
 
-    public void setTimeStamp(int timeStamp) {
+    public void setNoteCount(int noteCount) {
+        this.noteCount = noteCount;
+        values.put(VisitTable.COLUMN_NOTE_COUNT, noteCount);
+    }
+
+    public PhotoEntityBean getPhoto() {
+        return photoEntityBean;
+    }
+
+    public void setPhoto(PhotoEntityBean photoEntityBean) {
+        this.photoEntityBean = photoEntityBean;
+        photos.add(photoEntityBean);
+    }
+
+
+    public void setPhotoId(long photoId) {
+        this.photoId = photoId;
+        values.put(VisitTable.COLUMN_VISIT_PHOTO_ID, photoId);
+    }
+
+    public List<PhotoEntityBean> getPhotoList() {
+        return photos;
+    }
+
+    public long getTimeStamp() {
+        return values.getAsLong(VisitTable.COLUMN_TIMESTAMP);
+    }
+
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
-//        values.put(VisitTable.COLUMN_VISIT_CREATED_AT, " time('now') " );
         values.put(VisitTable.COLUMN_TIMESTAMP, timeStamp);
     }
+
+
+
 
 
     @Override

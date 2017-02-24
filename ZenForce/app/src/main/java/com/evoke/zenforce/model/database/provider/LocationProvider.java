@@ -7,6 +7,6 @@ public class LocationProvider extends BaseProvider {
 
     @Override
     protected String getTableName() {
-        return DbConstants.LocationTable.TABLE_NAME;
+        return DbConstants.PlaceTable.TABLE_NAME;
     }
 }

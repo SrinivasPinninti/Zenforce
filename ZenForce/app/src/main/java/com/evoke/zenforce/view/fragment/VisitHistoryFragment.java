@@ -16,47 +16,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.evoke.zenforce.R;
-import com.evoke.zenforce.model.adapter.VisitedHistoryListAdapter;
-import com.evoke.zenforce.model.database.DbConstants;
-import com.evoke.zenforce.model.database.beanentity.NoteEntityBean;
-import com.evoke.zenforce.model.database.beanentity.PhotoEntityBean;
-import com.evoke.zenforce.model.database.beanentity.TimerEntityBean;
-import com.evoke.zenforce.model.database.dao.NoteDAO;
-import com.evoke.zenforce.model.database.dao.PhotoDAO;
-import com.evoke.zenforce.model.database.dao.TimerDAO;
+import com.evoke.zenforce.model.adapter.TodayListAdapter;
+import com.evoke.zenforce.model.database.beanentity.VisitBean;
+import com.evoke.zenforce.model.database.dao.VisitDAO;
 import com.evoke.zenforce.view.activity.VisitActivity;
 import com.evoke.zenforce.view.application.ZenForceApplication;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class VisitHistoryFragment extends Fragment {
 
     private static final String TAG = "History";
     private Context mContext;
 
-    private TextView tvDate;
-    private TextView tvImageNumber;
-    private TextView tvNotesNumber;
-    private TextView tvVisitNumber;
 
     private long mVisitId;
-//    private String mLocationId;
 
 
     private RecyclerView mRecyclerView;
-    private VisitedHistoryListAdapter mVisitHistoryAdapter;
+    private TodayListAdapter mAdapter;
 
-    private Map<String, Integer> map = new HashMap<String, Integer>();
-
-
-
-    private boolean photo, note, time;
 
     public VisitHistoryFragment() {
         // Required empty public constructor
@@ -86,16 +69,13 @@ public class VisitHistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         VisitActivity activity = (VisitActivity) getActivity();
-        mVisitId = activity.getVisitId();
-//        mLocationId = activity.getLocationId();
+        mVisitId = activity.getPlaceId();
+//        mLocationId = activity.getPlaceId();
         Log.v(TAG, "onCreateView  mVisitId : " + mVisitId);
         View v = inflater.inflate(R.layout.fragment_visit_history, container, false);
         initUI(v);
 
-        getLoaderManager().initLoader(7, null, mLoaderCallbacks);
-        getLoaderManager().initLoader(8, null, mLoaderCallbacks);
-        getLoaderManager().initLoader(9, null, mLoaderCallbacks);
-
+        getLoaderManager().initLoader(7, null, mLoader);
         return v;
     }
 
@@ -106,10 +86,6 @@ public class VisitHistoryFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ZenForceApplication.getInstance());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mContext));
-        tvDate        = (TextView) v.findViewById(R.id.tvDate);
-        tvImageNumber = (TextView) v.findViewById(R.id.tvImageNumber);
-        tvNotesNumber = (TextView) v.findViewById(R.id.tvNotesNumber);
-        tvVisitNumber = (TextView) v.findViewById(R.id.tvVisitNumber);
     }
 
 
@@ -138,143 +114,57 @@ public class VisitHistoryFragment extends Fragment {
         super.onPause();
     }
 
-    private LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+
+    private ArrayList<VisitBean> visitList;
+    LoaderManager.LoaderCallbacks<Cursor> mLoader = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            Log.d(TAG, " onCreateLoader....mVisitId :  " + mVisitId);
-            switch (id) {
-
-                case 7: {
-
-                    PhotoDAO dao = PhotoDAO.getSingletonInstance(mContext);
-                    String selection = DbConstants.PhotoTable.COLUMN_VISIT_ID + " = ?";
-                    String[] selectionArgs = new String[]{String.valueOf(mVisitId)};
-
-//                  String sortOrder = DbConstants.VisitTable.COLUMN_TIMESTAMP + " DESC LIMIT 7 ";
-                    return new CursorLoader(mContext, dao.getURI(), null, selection, selectionArgs, null);
-                }
-                case 8:
-                {
-
-                    NoteDAO dao = NoteDAO.getSingletonInstance(mContext);
-                    String selection = DbConstants.NoteTable.COLUMN_VISIT_ID + " = ?";
-                    String[] selectionArgs = new String[]{String.valueOf(mVisitId)};
-
-//                  String sortOrder = DbConstants.VisitTable.COLUMN_TIMESTAMP + " DESC LIMIT 7 ";
-                    return new CursorLoader(mContext, dao.getURI(), null, selection, selectionArgs, null);
-
-                }
-
-                case 9:
-                {
-                    TimerDAO dao = TimerDAO.getSingletonInstance(mContext);
-                    String selection = DbConstants.TimerTable.COLUMN_VISIT_ID + " = ?";
-                    String[] selectionArgs = new String[]{String.valueOf(mVisitId)};
-
-//                  String sortOrder = DbConstants.VisitTable.COLUMN_TIMESTAMP + " DESC LIMIT 7 ";
-                    return new CursorLoader(mContext, dao.getURI(), null, selection, selectionArgs, null);
-                }
-
-
-            }
-            return null;
+        public Loader onCreateLoader(int id, Bundle args) {
+            Log.v(TAG, "onCreateLoader id : " + id);
+            VisitDAO dao = VisitDAO.getSingletonInstance(mContext);
+            return new CursorLoader(mContext, dao.getURI(), null, null, null, null);
         }
 
         @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
-            Log.v(TAG, " onLoadFinished  id :  " +loader.getId());
-
-
-            switch (loader.getId()) {
-
-                case 7:
-                if (cursor != null && cursor.moveToFirst()) {
-
-                    ArrayList<PhotoEntityBean> photos = new ArrayList<PhotoEntityBean>();
-
-                    do {
-                        PhotoDAO dao = PhotoDAO.getSingletonInstance(mContext);
-                        PhotoEntityBean photoEntityBean = (PhotoEntityBean) dao.populate(cursor);
-                        photos.add(photoEntityBean);
-                    } while (cursor.moveToNext());
-
-                    Log.v(TAG, "photos " + photos.size());
-                    map.put("PHOTO",photos.size());
-                }
+        public void onLoadFinished(Loader loader, Cursor cursor) {
+            Log.v(TAG, "onLoadFinished.... "+ loader.getId());
 
 
-                    photo = true;
+            if (cursor != null && cursor.moveToFirst()) {
 
-                    break;
+                visitList = new ArrayList<VisitBean>();
 
-                case 8:
+                do {
 
-                    if (cursor != null && cursor.moveToFirst()) {
+                    VisitDAO dao = VisitDAO.getSingletonInstance(mContext);
+                    VisitBean bean = (VisitBean) dao.populate(cursor);
+                    visitList.add(bean);
 
-                        ArrayList<NoteEntityBean> notes = new ArrayList<NoteEntityBean>();
+                } while (cursor.moveToNext());
 
-                        do {
-                            NoteDAO dao = NoteDAO.getSingletonInstance(mContext);
-                            NoteEntityBean noteEntityBean = (NoteEntityBean) dao.populate(cursor);
-                            notes.add(noteEntityBean);
-                        } while (cursor.moveToNext());
 
-                        Log.v(TAG, "notes " + notes.size());
-                        map.put("NOTE", notes.size());
+                Log.v(TAG, " visitList list  :  " + visitList.size());
+
+                Comparator<VisitBean> comparator = new Comparator<VisitBean>() {
+                    @Override
+                    public int compare(VisitBean lhs, VisitBean rhs) {
+                        return lhs.getName().compareTo(rhs.getName());
                     }
+                };
 
-                    note = true;
-                    break;
+                Collections.sort(visitList, comparator);
 
-                case 9:
+                mAdapter = new TodayListAdapter(mContext, visitList);
+                mRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
 
-                    if (cursor != null && cursor.moveToFirst()) {
-
-                        ArrayList<TimerEntityBean> times = new ArrayList<TimerEntityBean>();
-
-                        do {
-                            TimerDAO dao = TimerDAO.getSingletonInstance(mContext);
-                            TimerEntityBean timerEntityBean = (TimerEntityBean) dao.populate(cursor);
-                            times.add(timerEntityBean);
-                        } while (cursor.moveToNext());
-
-                        Log.v(TAG, "times " + times.size());
-                        map.put("TIMER", times.size());
-                    }
-
-                    time = true;
-                    break;
             }
-
-            if (photo && note && time) {
-
-                List<Map<String, Integer>> list = new ArrayList<>();
-
-                photo= false;
-                time= false;
-                note = false;
-
-                Log.v(TAG, " set map to adapter : " + map.size());
-                list.add(map);
-
-                Log.v(TAG, " list : " + list.size());
-                mVisitHistoryAdapter = new VisitedHistoryListAdapter(mContext, list);
-                mRecyclerView.setAdapter(mVisitHistoryAdapter);
-            }
-
-
-
 
 
         }
 
-
-
         @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
-//            mVisitHistoryAdapter.setData(null, false, false);
+        public void onLoaderReset(Loader loader) {
+            mRecyclerView.swapAdapter(null, true);
         }
     };
 

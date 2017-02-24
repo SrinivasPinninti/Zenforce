@@ -27,7 +27,8 @@ import android.widget.RelativeLayout;
 
 import com.evoke.zenforce.R;
 import com.evoke.zenforce.model.adapter.VisitedPlacesListAdapter;
-import com.evoke.zenforce.model.database.beanentity.VisitBean;
+import com.evoke.zenforce.model.database.beanentity.PlaceBean;
+import com.evoke.zenforce.model.database.dao.PlaceDAO;
 import com.evoke.zenforce.model.database.dao.VisitDAO;
 import com.evoke.zenforce.view.activity.PlaceMapActivity;
 import com.evoke.zenforce.view.application.ZenForceApplication;
@@ -51,7 +52,7 @@ public class VisitedPlacesFragment extends Fragment {
     private Toolbar mToolbar;
     private Activity mActivity;
 
-    private  ArrayList<VisitBean> mPlaceList = null;
+    private  ArrayList<PlaceBean> mPlaceList = null;
     private RelativeLayout RlNoPlaces;
 
 
@@ -142,16 +143,19 @@ public class VisitedPlacesFragment extends Fragment {
 
 
             if (cursor != null && cursor.moveToFirst()) {
+
+
                 RlNoPlaces.setVisibility(View.GONE);
                 etSearch.setVisibility(View.VISIBLE);
                 addTextChangeListener();
 
-                mPlaceList = new ArrayList<VisitBean>();
+                mPlaceList = new ArrayList<PlaceBean>();
 
+                Log.v(TAG, " cursor count " + cursor.getCount());
                 do {
 
-                    VisitDAO dao = VisitDAO.getSingletonInstance(mContext);
-                    VisitBean bean = (VisitBean) dao.populate(cursor);
+                    PlaceDAO dao = PlaceDAO.getSingletonInstance(mContext);
+                    PlaceBean bean = (PlaceBean) dao.populate(cursor);
                     mPlaceList.add(bean);
 
                 } while (cursor.moveToNext());
@@ -159,9 +163,9 @@ public class VisitedPlacesFragment extends Fragment {
 
                 Log.v(TAG, " no of places from db :  " + mPlaceList.size());
 
-                Comparator<VisitBean> comparator = new Comparator<VisitBean>() {
+                Comparator<PlaceBean> comparator = new Comparator<PlaceBean>() {
                     @Override
-                    public int compare(VisitBean lhs, VisitBean rhs) {
+                    public int compare(PlaceBean lhs, PlaceBean rhs) {
                         return lhs.getName().compareTo(rhs.getName());
                     }
                 };
@@ -202,16 +206,16 @@ public class VisitedPlacesFragment extends Fragment {
 
                 if (mPlaceList != null) {
 
-                    ArrayList<VisitBean> searchList = new ArrayList<VisitBean>();
+                    ArrayList<PlaceBean> searchList = new ArrayList<PlaceBean>();
 
                     int size = mPlaceList.size();
 
                     for (int i=0; i<size; i++) {
-                        VisitBean visit = mPlaceList.get(i);
-                        String name = visit.getName().toLowerCase();
+                        PlaceBean place = mPlaceList.get(i);
+                        String name = place.getName().toLowerCase();
 
                         if (name.contains(query)) {
-                            searchList.add(visit);
+                            searchList.add(place);
                         }
 
                     }

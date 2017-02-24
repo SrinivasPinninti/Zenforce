@@ -51,8 +51,9 @@ public class PhotoDAO extends BaseDAO{
         PhotoEntityBean bean = new PhotoEntityBean();
         bean.set_ID(cursor.getLong(DbConstants.PhotoTable.ID_ID));
         bean.setVisitId(cursor.getLong(DbConstants.PhotoTable.ID_VISIT_ID));
-        bean.setPath(cursor.getString(DbConstants.PhotoTable.ID_PHOTO_PATH));
-        bean.setTag(cursor.getString(DbConstants.PhotoTable.ID_PHOTO_TAG));
+        bean.setPath(cursor.getString(DbConstants.PhotoTable.ID_PATH));
+        bean.setComment(cursor.getString(DbConstants.PhotoTable.ID_COMMENT));
+        bean.setTag(cursor.getString(DbConstants.PhotoTable.ID_TAG));
         bean.setTimeStamp(cursor.getInt(DbConstants.PhotoTable.ID_TIMESTAMP));
         return bean;
     }
@@ -60,5 +61,18 @@ public class PhotoDAO extends BaseDAO{
     public int update(PhotoEntityBean bean, String selection, String[] selectionArgs) {
         Log.v(TAG, " update record....");
         return  update(bean.getValues(), selection, selectionArgs);
+    }
+
+
+    public int getCount(String[] projection, String selection, String[] selectionArgs) {
+
+        Cursor cursor = query(projection, selection, selectionArgs, null);
+
+        if (cursor != null && cursor.moveToNext()) {
+
+            return cursor.getCount();
+        }
+
+        return 0;
     }
 }

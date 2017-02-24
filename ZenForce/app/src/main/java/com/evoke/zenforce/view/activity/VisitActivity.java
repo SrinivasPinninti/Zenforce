@@ -1,5 +1,6 @@
 package com.evoke.zenforce.view.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
@@ -11,13 +12,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.evoke.zenforce.R;
-import com.evoke.zenforce.model.database.beanentity.VisitBean;
+import com.evoke.zenforce.model.database.beanentity.PhotoEntityBean;
+import com.evoke.zenforce.model.database.beanentity.PlaceBean;
 import com.evoke.zenforce.model.pojo.placedetails.Result;
+import com.evoke.zenforce.utility.Util;
 import com.evoke.zenforce.view.fragment.ActivitiesFragment;
+import com.evoke.zenforce.view.fragment.HistoryFragment;
 import com.evoke.zenforce.view.fragment.InfoFragment;
 import com.evoke.zenforce.view.fragment.VisitHistoryFragment;
 
@@ -39,18 +44,29 @@ public class VisitActivity extends AppCompatActivity implements
     private TextView tvPlaceAddress;
     private Toolbar mToolbar;
 
-    private long mVisitId;
-    private String mName;
-    private String mAddress;
-    private String mPhone;
-    private String mUrl;
+    private long    mPlaceId;
+    private String  mPlaceName;
+    private String  mPlaceAddress;
+    private String  mPhone;
+    private String  mUrl;
 
     private String mLat;
     private String mLng;
 
     private ViewPagerAdapter mViewPagerAdapter;
-//    private String mLocationId;
+//    private VisitBean visitBean;
+//    private long insertedVisitId;
 
+
+    private long startTime;
+    private PhotoEntityBean bean;
+    private long id;
+
+    int check = 0;
+
+    ActivitiesFragment activitiesFragment;
+    InfoFragment  infoFragment;
+    HistoryFragment historyFragment;
 
 
     @Override
@@ -59,21 +75,29 @@ public class VisitActivity extends AppCompatActivity implements
         Log.v(TAG, "onCreate...");
         setContentView(R.layout.activity_visit);
         initUI();
-        getDataFromIntent();
+        mViewPager.setOffscreenPageLimit(2);
+        setupViewPager(mViewPager);
+        mTabLayout.setupWithViewPager(mViewPager);
+        startVisit();
 
     }
+
 
     private void initUI() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-       /* mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
-        });*/
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        });
+
+
+
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         tvPlaceName = (TextView) findViewById(R.id.tvPlaceName);
@@ -82,8 +106,8 @@ public class VisitActivity extends AppCompatActivity implements
 
 
 
-    public long getVisitId() {
-        return mVisitId;
+    public long getPlaceId() {
+        return mPlaceId;
     }
 
     public String getPhone() {
@@ -102,36 +126,45 @@ public class VisitActivity extends AppCompatActivity implements
         return mLng;
     }
 
+    public String getName() {
+        return mPlaceName;
+    }
+
+    public String getPlaceAddress() {
+        return mPlaceAddress;
+    }
 
 
-    private void getDataFromIntent() {
+
+    private void startVisit() {
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            VisitBean bean = bundle.getParcelable("visitBean");
-            long visitId = bean.get_ID();
-            Log.d(TAG, "visitId : " +visitId);
-            mVisitId = visitId;
-            mName       = bean.getName();
-            mAddress    = bean.getAddress();
-            mPhone      = bean.getPhone();
-            mUrl        = bean.getWebsite();
-            mLat        = bean.getLocationLat();
-            mLng        = bean.getLocationLng();
+            PlaceBean place = bundle.getParcelable("placeBean");
 
-            tvPlaceName.setText(mName);
-            tvPlaceAddress.setText(mAddress);
+            if (place == null) return;
+
+                mPlaceId = place.get_ID();
+                mPlaceName = place.getName();
+                mPlaceAddress = place.getAddress();
+                mPhone      = place.getPhone();
+                mUrl        = place.getWebsite();
+                mLat        = place.getLat();
+                mLng        = place.getLng();
+
+                tvPlaceName.setText(mPlaceName);
+                tvPlaceAddress.setText(mPlaceAddress);
+
+
 
         } else {
-            Log.e(TAG, "some error......");
+            Log.e(TAG, "bundle error......");
 
 
         }
 
 
     }
-
-
 
 
     @Override
@@ -145,9 +178,7 @@ public class VisitActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         Log.v(TAG, "onResume...");
-        mViewPager.setOffscreenPageLimit(2);
-        setupViewPager(mViewPager);
-        mTabLayout.setupWithViewPager(mViewPager);
+
     }
 
 
@@ -167,13 +198,14 @@ public class VisitActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         Log.v(TAG, "onDestroy...");
+        Util.sVisitId = 0;
     }
 
 
 
-    public String getVisitName() {
-        Log.v(TAG, " getVisitName : " + mName);
-        return mName;
+    public String getPlaceName() {
+        Log.v(TAG, " getPlaceName : " + mPlaceName);
+        return mPlaceName;
     }
 
 
@@ -181,18 +213,18 @@ public class VisitActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        Log.v(TAG, "onSaveInstanceState.....mName..." + mName);
-        outState.putString("visitName", mName);
-        outState.putString("visitAddress", mAddress);
+        Log.v(TAG, "onSaveInstanceState.....mPlaceName..." + mPlaceName);
+        outState.putString("visitName", mPlaceName);
+        outState.putString("visitAddress", mPlaceAddress);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.v(TAG, "onRestoreInstanceState.....mName..." + mName);
+        Log.v(TAG, "onRestoreInstanceState.....mPlaceName..." + mPlaceName);
         if (savedInstanceState != null) {
-            mName = savedInstanceState.getString("visitName");
-            mAddress = savedInstanceState.getString("visitAddress");
+            mPlaceName = savedInstanceState.getString("visitName");
+            mPlaceAddress = savedInstanceState.getString("visitAddress");
         }
     }
 
@@ -235,7 +267,7 @@ public class VisitActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-
+                check = position;
             }
 
             @Override
@@ -248,7 +280,9 @@ public class VisitActivity extends AppCompatActivity implements
     }
 
 
-    private static class ViewPagerAdapter extends FragmentStatePagerAdapter {
+
+
+    private  class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
@@ -260,7 +294,26 @@ public class VisitActivity extends AppCompatActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            return mFragmentList.get(position);
+//            Fragment fragment = mFragmentList.get(position);
+            Fragment fragment = new Fragment();
+
+            switch (position) {
+
+                case 0:
+                    activitiesFragment = ActivitiesFragment.newInstance();
+                    fragment = activitiesFragment;
+                    break;
+                case 1:
+                    infoFragment = InfoFragment.newInstance();
+                    fragment = infoFragment;
+                    break;
+                case 2:
+                    historyFragment = HistoryFragment.newInstance();
+                    fragment = historyFragment;
+                    break;
+            }
+
+            return fragment;
         }
 
         @Override
@@ -299,10 +352,23 @@ public class VisitActivity extends AppCompatActivity implements
         }
     }
 
-
-
     @Override
     public void onBackPressed() {
-        finish();
+        Log.e(TAG, "onBackPressed check : " + check);
+        switch (check) {
+            case 0:
+                activitiesFragment.onBackPressed();
+                break;
+            case 1:
+            case 2:
+               finish();
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult of Visit : ");
     }
 }

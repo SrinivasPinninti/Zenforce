@@ -27,4 +27,46 @@
     <color name="chip_background">#9C27B0</color>
     <color name="chip_background_selected">#7B1FA2</color>
 
+
+    <color name="today_bg">#1976D2</color>
+
+  <!--  <color name="today_primary">#1976D2</color>
+    <color name="today_primary_dark">#7B1FA2</color>
+    <color name="today_primary_light">#E1BEE7</color>
+    <color name="today_accent">#FF4081</color>
+    <color name="today_primary_text">#212121</color>
+    <color name="today_secondary_text">#757575</color>
+    <color name="today_icons">#FFFFFF</color>
+    <color name="today_divider">#BDBDBD</color>-->
+
+    <color name="today_primary">#009688</color>
+    <color name="today_primary_dark">#00796B</color>
+    <color name="today_primary_light">#B2DFDB</color>
+    <color name="today_accent">#E040FB</color>
+    <color name="today_primary_text">#212121</color>
+    <color name="today_secondary_text">#757575</color>
+    <color name="today_icons">#FFFFFF</color>
+    <color name="today_divider">#BDBDBD</color>
+
+
+    <color name="brown_500">#795548</color>
+    <color name="brown_700">#5D4037</color>
+    <color name="orange_500">#FF5722</color>
+    <color name="lime_400">#D4E157</color>
+    <color name="blue_200">#90CAF9</color>
+
+
+    <color name="actionbar">#3cb879</color>
+    <color name="body_background">#e8e8e8</color>
+    <color name="body_background_green">#82e783</color>
+    <color name="server_status_bar">#2b2b2b</color>
+    <color name="title_gray">#434343</color>
+    <color name="bg_msg_you">#5eb964</color>
+    <color name="bg_msg_from">#e5e7eb</color>
+    <color name="msg_border_color">#a1a1a1</color>
+    <color name="bg_btn_join">#1e6258</color>
+    <color name="bg_msg_input">#e8e8e8</color>
+    <color name="text_msg_input">#626262</color>
+    <color name="lblFromName">#777777</color>
+
 </resources>

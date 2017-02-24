@@ -14,6 +14,10 @@
     <dimen name="chip_line_spacing">4dp</dimen>
     <dimen name="chip_corner_radius">16dp</dimen>
     <dimen name="background_corner_radius">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="_24sp">24sp</dimen>
+    <dimen name="_6dp">6dp</dimen>
 
 
 </resources>

@@ -115,7 +115,7 @@ public class NavigationDrawerAdapter extends BaseAdapter {
        public MyViewHolder(View view) {
            super(view);
            nav_view = view.findViewById(R.id.view_color);
-           nav_image = (ImageView) view.findViewById(R.id.nav_image);
+           nav_image = (ImageView) view.findViewById(R.id.nav_image); // TODO :ClassCastException: android.view.View cannot be cast to android.widget.ImageView
            nav_text = (TextView) view.findViewById(R.id.item_name);
        }
 

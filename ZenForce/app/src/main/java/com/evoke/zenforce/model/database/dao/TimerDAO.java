@@ -1,3 +1,4 @@
+/*
 package com.evoke.zenforce.model.database.dao;
 
 import android.content.Context;
@@ -9,9 +10,11 @@ import com.evoke.zenforce.model.database.DbConstants;
 import com.evoke.zenforce.model.database.beanentity.BaseEntityBean;
 import com.evoke.zenforce.model.database.beanentity.TimerEntityBean;
 
+*/
 /**
  * Created by spinninti on 12/1/2016.
- */
+ *//*
+
 public class TimerDAO extends BaseDAO{
 
     private static final String TAG = "TimerDAO";
@@ -81,3 +84,4 @@ public class TimerDAO extends BaseDAO{
 
     }
 }
+*/

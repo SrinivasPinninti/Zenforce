@@ -58,7 +58,7 @@ public class InfoFragment extends Fragment  implements View.OnClickListener{
                              Bundle savedInstanceState) {
 
         VisitActivity activity = (VisitActivity) getActivity();
-        mVisitId = activity.getVisitId();
+        mVisitId = activity.getPlaceId();
         mPhone   = activity.getPhone();
         mUrl     = activity.getUrl();
         mLat     = activity.getLat();

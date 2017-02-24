@@ -11,10 +11,12 @@ import com.evoke.zenforce.model.database.DbConstants.PhotoTable;
 public class PhotoEntityBean extends BaseEntityBean{
 
     private long _ID;
-    private long visitId;
+
     private String path;
     private String tag;
+    private String comment;
     private int timeStamp;
+    private long visitId;
 
 
 
@@ -43,23 +45,31 @@ public class PhotoEntityBean extends BaseEntityBean{
     }
 
     public String getPath() {
-        return values.getAsString(PhotoTable.COLUMN_PHOTO_PATH);
+        return values.getAsString(PhotoTable.COLUMN_PATH);
     }
 
     public void setPath(String path) {
         this.path = path;
-        values.put(PhotoTable.COLUMN_PHOTO_PATH, path);
+        values.put(PhotoTable.COLUMN_PATH, path);
     }
 
     public String getTag() {
-        return values.getAsString(PhotoTable.COLUMN_PHOTO_TAG);
+        return values.getAsString(PhotoTable.COLUMN_TAG);
     }
 
     public void setTag(String tag) {
         this.tag = tag;
-        values.put(PhotoTable.COLUMN_PHOTO_TAG, tag);
+        values.put(PhotoTable.COLUMN_TAG, tag);
     }
 
+    public String getComment() {
+        return values.getAsString(PhotoTable.COLUMN_COMMENT);
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+        values.put(PhotoTable.COLUMN_COMMENT, comment);
+    }
 
     public int getTimeStamp() {
         return values.getAsInteger(DbConstants.PhotoTable.COLUMN_TIMESTAMP);

@@ -2,6 +2,7 @@ package com.evoke.zenforce.model.database.dao;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
@@ -11,8 +12,6 @@ import com.evoke.zenforce.model.database.DbConstants;
 import com.evoke.zenforce.model.database.DbConstants.VisitTable;
 import com.evoke.zenforce.model.database.beanentity.BaseEntityBean;
 import com.evoke.zenforce.model.database.beanentity.VisitBean;
-
-import java.util.ArrayList;
 
 /**
  * Created by spinninti on 11/23/2016.
@@ -24,10 +23,22 @@ public class VisitDAO extends BaseDAO {
 
     private static VisitDAO visitDAO;
 
+    protected SQLiteDatabase database;
+    private DatabaseHelper dbHelper;
+
     public VisitDAO(Context context) {
         super(context);
+        this.mContext = context;
+        dbHelper = DatabaseHelper.getInstance(mContext);
+        open();
+
     }
 
+    public void open() throws SQLException {
+        if(dbHelper == null)
+            dbHelper = DatabaseHelper.getInstance(mContext);
+        database = dbHelper.getWritableDatabase();
+    }
     @Override
     public Uri getURI() {
         return DbConstants.VisitTable.CONTENT_URI;
@@ -46,14 +57,16 @@ public class VisitDAO extends BaseDAO {
     public BaseEntityBean populate(Cursor cursor) {
         VisitBean bean = new VisitBean();
         bean.set_ID(cursor.getLong(VisitTable.ID_ID));
+        bean.setPlaceId(cursor.getLong(VisitTable.ID_PLACE_ID));
         bean.setName(cursor.getString(VisitTable.ID_NAME));
         bean.setAddress(cursor.getString(VisitTable.ID_ADDRESS));
-        bean.setPhone(cursor.getString(VisitTable.ID_PHONE));
-        bean.setWebsite(cursor.getString(VisitTable.ID_WEBSITE));
-        bean.setLocationId(cursor.getString(VisitTable.ID_LOCATION_ID));
-        bean.setLocationLat(cursor.getString(VisitTable.ID_LOCATION_LAT));
-        bean.setLocationLng(cursor.getString(VisitTable.ID_LOCATION_LNG));
-        bean.setTimeStamp(cursor.getInt(VisitTable.ID_TIMESTAMP));
+        bean.setStart_time(cursor.getLong(VisitTable.ID_START_TIME));
+        bean.setEnd_time(cursor.getLong(VisitTable.ID_END_TIME));
+        bean.setImagePath(cursor.getString(VisitTable.ID_IMG_PATH));
+        bean.setImageCount(cursor.getInt(VisitTable.ID_IMG_COUNT));
+        bean.setNote(cursor.getString(VisitTable.ID_NOTE));
+        bean.setNoteCount(cursor.getInt(VisitTable.ID_NOTE_COUNT));
+        bean.setTimeStamp(cursor.getLong(VisitTable.ID_TIMESTAMP));
 
         return bean;
     }
@@ -70,50 +83,99 @@ public class VisitDAO extends BaseDAO {
         return  update(bean.getValues(), selection, selectionArgs);
     }
 
+    public int updateTimeStamp(BaseEntityBean bean, String selection, String[] selectionArgs) {
+        Log.v(TAG, " update time stamp......");
+        return  update(bean.getValues(), selection, selectionArgs);
+    }
+
+
+    /*public ArrayList<VisitBean> getVisits() {
+
+
+        ArrayList<VisitBean> visits = new ArrayList<VisitBean>();
+      *//*  String query = "SELECT " + VisitTable.COLUMN_NAME + ","
+                + VisitTable.COLUMN_ADDRESS + "," + VisitTable.COLUMN_VISIT_PHOTO_ID	+ ","
+                + DbConstants.PhotoTable.COLUMN_PATH + ","
+                + DbConstants.PhotoTable.COLUMN_COMMENT + " FROM "
+                + DataBaseHelper.EMPLOYEE_TABLE + " emp, "
+                + DataBaseHelper.DEPARTMENT_TABLE + " dept WHERE emp."
+                + DataBaseHelper.EMPLOYEE_DEPARTMENT_ID + " = dept."
+                + DataBaseHelper.ID_COLUMN;*//*
 
 
 
 
-    public ArrayList<BaseEntityBean> getHistoryByVisit(long visitId) {
-
-        Log.v(TAG, " getHistoryByVisit " + visitId);
-        DatabaseHelper mDbHelper = new DatabaseHelper(mContext);
-
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String rawQuery = "SELECT name FROM " + DbConstants.VisitTable.TABLE_NAME + " INNER JOIN " + DbConstants.PhotoTable.TABLE_NAME
-                + " ON " + VisitTable.COLUMN_ID + " = " + DbConstants.PhotoTable.COLUMN_VISIT_ID;
-//                + " WHERE " + DbConstants.VisitTable.COLUMN_ID + " = " +  8;
+      *//*  String query = "SELECT " + VisitTable.COLUMN_NAME + ","
+                + VisitTable.COLUMN_ADDRESS + "," + VisitTable.COLUMN_VISIT_PHOTO_ID	+ ","
+                + DbConstants.PhotoTable.COLUMN_PATH + ","
+                + DbConstants.PhotoTable.COLUMN_COMMENT + " FROM "
+                + VisitTable.TABLE_NAME + " v INNER JOIN "
+                + DbConstants.PhotoTable.TABLE_NAME + " p ON "
+                + VisitTable.COLUMN_VISIT_PHOTO_ID + " = "
+                + DbConstants.PhotoTable.COLUMN_ID;*//*
 
 
-
-//        SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
-//        FROM Orders
-//        INNER JOIN Customers
-//        ON Orders.CustomerID=Customers.CustomerID;
+//        String query = "SELECT name,address,photo_id,path,comment FROM visit v INNER JOIN photo p ON visit.photo_id = photo._id";
 
 
-//        String MY_QUERY = "SELECT * FROM photo INNER JOIN note ON " +  DbConstants.PhotoTable.COLUMN_VISIT_ID + " = " +  DbConstants.NoteTable.COLUMN_VISIT_ID + " WHERE " +
-//                DbConstants.PhotoTable.COLUMN_VISIT_ID + " = " + visitId;
+         String query ="SELECT name, address, photo_id, path, comment FROM visit v INNER JOIN photo p ON v.photo_id = p._id";
 
+        Log.d("query", query);
+        Cursor cursor = database.rawQuery(query, null);
 
-        Cursor cursor = db.rawQuery(rawQuery, null);
-
-        Log.d(TAG, " History records count : " + cursor.getCount());
+        Log.d(TAG, " cursor count : " + cursor.getCount());
 
         if (cursor != null && cursor.moveToFirst()) {
 
 
-
             do {
+                VisitBean visit = new VisitBean();
+                visit.setName(cursor.getString(0));
+                visit.setAddress(cursor.getString(1));
+                visit.setPhotoId(cursor.getLong(2));
+
+
+                PhotoEntityBean photo = new PhotoEntityBean();
+
+                photo.setPath(cursor.getString(3));
+
+                photo.setComment(cursor.getString(4));
+
+                visit.setPhoto(photo);
+
+                visits.add(visit);
+
+            }  while (cursor.moveToNext());
+        }
+
+        return visits;
+
+
+    }*/
 
 
 
-            }while (cursor.moveToNext());
+    public VisitBean getLastInsertedRow(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
+
+        Cursor cursor = query(projection, selection, selectionArgs, sortOrder);
+
+        if (cursor != null && cursor.moveToFirst()) {
+
+           VisitBean bean = (VisitBean) populate(cursor);
+
+            return bean;
         }
 
 
         return null;
+
+
     }
+
+
+
+
+
+
 }

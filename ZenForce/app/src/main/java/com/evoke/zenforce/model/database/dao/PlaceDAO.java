@@ -1,4 +1,3 @@
-/*
 package com.evoke.zenforce.model.database.dao;
 
 import android.content.Context;
@@ -8,26 +7,25 @@ import android.util.Log;
 
 import com.evoke.zenforce.model.database.DbConstants;
 import com.evoke.zenforce.model.database.beanentity.BaseEntityBean;
-import com.evoke.zenforce.model.database.beanentity.PlaceEntityBean;
+import com.evoke.zenforce.model.database.beanentity.PlaceBean;
 
-import java.util.ArrayList;
-import java.util.List;
-
-*/
 /**
- * Created by spinninti on 11/20/2016.
- *//*
-
+ * Created by spinninti on 11/23/2016.
+ */
 public class PlaceDAO extends BaseDAO {
 
-
     private static final String TAG = "PlaceDAO";
-    private static PlaceDAO placeDAO = null;
-
     private static Context mContext;
+
+    private static PlaceDAO placeDAO;
 
     public PlaceDAO(Context context) {
         super(context);
+    }
+
+    @Override
+    public Uri getURI() {
+        return DbConstants.PlaceTable.CONTENT_URI;
     }
 
 
@@ -40,15 +38,27 @@ public class PlaceDAO extends BaseDAO {
     }
 
     @Override
-    public Uri getURI() {
-        return DbConstants.PlaceTable.CONTENT_URI;
+    public BaseEntityBean populate(Cursor cursor) {
+        PlaceBean bean = new PlaceBean();
+        bean.set_ID(cursor.getLong(DbConstants.PlaceTable.ID_ID));
+        bean.setPlaceId(cursor.getString(DbConstants.PlaceTable.ID_LOCATION_ID));
+        bean.setName(cursor.getString(DbConstants.PlaceTable.ID_NAME));
+        bean.setAddress(cursor.getString(DbConstants.PlaceTable.ID_ADDRESS));
+        bean.setPhone(cursor.getString(DbConstants.PlaceTable.ID_PHONE));
+        bean.setWebsite(cursor.getString(DbConstants.PlaceTable.ID_WEBSITE));
+        bean.setLat(cursor.getString(DbConstants.PlaceTable.ID_LAT));
+        bean.setLng(cursor.getString(DbConstants.PlaceTable.ID_LNG));
+        bean.setTimeStamp(cursor.getInt(DbConstants.PlaceTable.ID_TIMESTAMP));
+
+        return bean;
     }
 
-    public long insert(PlaceEntityBean bean) {
-       return  insert(bean.getValues());
+    public long insert(PlaceBean bean) {
+        Log.v(TAG, " insert place....");
+        return  insert(bean.getValues());
     }
 
-    public List<BaseEntityBean> getAllPlaces(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    /*public List<BaseEntityBean> getAllPlaces(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         Cursor cursor = null;
         ArrayList<BaseEntityBean> arrayList = new ArrayList<BaseEntityBean>();
@@ -71,20 +81,10 @@ public class PlaceDAO extends BaseDAO {
         }
         Log.d("BaseDAO", "readAll() arrayList count " + arrayList.size());
         return arrayList;
-    }
+    }*/
 
-    @Override
-    public BaseEntityBean populate(Cursor cursor) {
-        PlaceEntityBean bean = new PlaceEntityBean();
-        bean.set_ID(cursor.getLong(DbConstants.PlaceTable.ID_ID));
-        bean.setName(cursor.getString(DbConstants.PlaceTable.ID_NAME));
-        bean.setAddress(cursor.getString(DbConstants.PlaceTable.ID_ADDRESS));
-        bean.setPlaceId(cursor.getString(DbConstants.PlaceTable.ID_PLACE_ID));
-        bean.setPhone(cursor.getString(DbConstants.PlaceTable.ID_PHONE));
-        bean.setUrl(cursor.getString(DbConstants.PlaceTable.ID_WEBSITE));
-        bean.setCreated_at(cursor.getString(DbConstants.PlaceTable.ID_CREATED_AT));
-
-        return bean;
+    public int update(PlaceBean bean, String selection, String[] selectionArgs) {
+        Log.v(TAG, " update record....");
+        return  update(bean.getValues(), selection, selectionArgs);
     }
 }
-*/

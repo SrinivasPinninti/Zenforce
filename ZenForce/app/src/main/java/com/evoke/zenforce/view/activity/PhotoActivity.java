@@ -1,6 +1,7 @@
 package com.evoke.zenforce.view.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -20,13 +21,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.evoke.zenforce.R;
+import com.evoke.zenforce.model.database.DbConstants;
 import com.evoke.zenforce.model.database.beanentity.PhotoEntityBean;
+import com.evoke.zenforce.model.database.beanentity.VisitBean;
 import com.evoke.zenforce.model.database.dao.PhotoDAO;
+import com.evoke.zenforce.model.database.dao.VisitDAO;
+import com.evoke.zenforce.utility.Util;
 import com.evoke.zenforce.view.chip.Chip;
 import com.evoke.zenforce.view.chip.ChipViewAdapter;
 import com.evoke.zenforce.view.chip.MainChipViewAdapter;
@@ -38,27 +42,30 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class PhotoActivity extends AppCompatActivity implements OnChipClickListener{
+public class PhotoActivity extends AppCompatActivity implements  OnChipClickListener{
 
     private static final String TAG = "PhotoActivity";
 
     private Uri fileUri; // file url to store image/video
 
     private ImageView imageView;
+    private EditText etImageNote;
+
+
     private String mImagePath;
     private List<Chip> mTagList1;
     private com.evoke.zenforce.view.chip.ChipView mTextChipLayout;
-    private long mVisit_id;
+//    private long mVisitId;
     private Uri file;
 
     private int currentApiVersion;
 
-    public interface PhotoInsertedCallBack {
+    private long mVisitId;
 
-        void photoInserted(long rowId);
-    }
+    private HashMap<String, String> qaMap;
 
 
     @Override
@@ -67,17 +74,18 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
         setContentView(R.layout.activity_photo);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Add Photo");
 
         initUI();
-        extractDataFromBundle();
+
+
+       Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            mVisitId = bundle.getLong("visitId");
+            Log.d(TAG, "mVisitId : " + mVisitId);
+        }
 
         currentApiVersion = android.os.Build.VERSION.SDK_INT;
 
@@ -85,9 +93,7 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
         Log.v(TAG, "currentApiVersion : " + currentApiVersion);
 
         if (currentApiVersion > android.os.Build.VERSION_CODES.LOLLIPOP) {
-
             Log.v(TAG, " Marshmallow......");
-
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
             }
@@ -100,6 +106,28 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
         if (savedInstanceState == null) {  // Only first time capture image
             takePhoto();
         }
+    }
+
+    private void initUI() {
+
+        imageView = (ImageView) findViewById(R.id.img);
+        mTagList1 = new ArrayList<>();
+        mTagList1.add(new Tag("business", 1));
+        mTagList1.add(new Tag("movies", 2));
+        mTagList1.add(new Tag("sports", 2));
+        mTagList1.add(new Tag("engineering", 2));
+        mTagList1.add(new Tag("education", 2));
+
+        // Adapter
+        ChipViewAdapter adapterLayout = new MainChipViewAdapter(this);
+
+        // Custom layout and background colors
+        mTextChipLayout = (com.evoke.zenforce.view.chip.ChipView) findViewById(R.id.text_chip_layout);
+        mTextChipLayout.setAdapter(adapterLayout);
+        mTextChipLayout.setChipList(mTagList1);
+        mTextChipLayout.setOnChipClickListener(this);
+
+        etImageNote = (EditText) findViewById(R.id.etImageNote);
     }
 
 
@@ -139,38 +167,6 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
         Log.v(TAG, " onDestroy called....");
     }
 
-    private void initUI() {
-
-        imageView = (ImageView) findViewById(R.id.img);
-        mTagList1 = new ArrayList<>();
-        mTagList1.add(new Tag("business", 1));
-        mTagList1.add(new Tag("movies", 2));
-        mTagList1.add(new Tag("sports", 2));
-        mTagList1.add(new Tag("engineering", 2));
-        mTagList1.add(new Tag("education", 2));
-
-        // Adapter
-        ChipViewAdapter adapterLayout = new MainChipViewAdapter(this);
-
-        // Custom layout and background colors
-        mTextChipLayout = (com.evoke.zenforce.view.chip.ChipView) findViewById(R.id.text_chip_layout);
-        mTextChipLayout.setAdapter(adapterLayout);
-        mTextChipLayout.setChipList(mTagList1);
-        mTextChipLayout.setOnChipClickListener(this);
-    }
-
-    private void extractDataFromBundle() {
-
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            mVisit_id = bundle.getLong("visit_id");
-            mImagePath  = bundle.getString("imagePath");
-
-            getSupportActionBar().setTitle(bundle.getString("visitName"));
-        }
-
-    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -179,10 +175,12 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // All good!
 //                    permissionGranted = true;
-                    Toast.makeText(this, "Permission Granted!!!!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "Permission Granted!!!!", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, " Permission Granted!!!!");
                 } else {
 //                    permissionGranted = false;
-                    Toast.makeText(this, "No permission!!!!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "No permission!!!!", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, " No permission!!!!");
                 }
 
                 break;
@@ -205,7 +203,7 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
     }
 
     private void takePhoto() {
-        Log.v(TAG, " takePhoto called....");
+        Log.d(TAG, " takePhoto called....");
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         file = Uri.fromFile(getOutputMediaFile());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, file);
@@ -217,6 +215,8 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100) {
             if (resultCode == RESULT_OK) {
+
+                mImagePath = file.getPath();
                 Log.v(TAG, " set Image......");
                 if (currentApiVersion > android.os.Build.VERSION_CODES.LOLLIPOP) {
                     Log.v(TAG, "Marshmallow....");
@@ -232,7 +232,7 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
     private void previewCapturedImage() {
         try {
 
-            Bitmap bitmap1 = getCameraPhotoOrientation(file.getPath());
+            Bitmap bitmap1 = getCameraPhotoOrientation(mImagePath);
             imageView.setImageBitmap(bitmap1);
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -265,31 +265,52 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
         StringBuilder sb = new StringBuilder();
         for (Chip tag : mTagList1) {
            if (tag.getType() == 1) {
-               sb.append(tag.getText() + ",");
+               sb.append("#" + tag.getText() + ", ");
            }
         }
         String tags = sb.length() > 0 ? sb.substring(0, sb.length() - 1): "";
 
+        String imageNote = etImageNote.getText().toString().trim();
+
+//        Log.d(TAG, " sVisitId : " + Util.sVisitId);
 
 
-        Log.v(TAG, " mVisit_id : " + mVisit_id);
+        Log.d(TAG, " onSave mVisitId : " + mVisitId);
+        Log.d(TAG, " mImagePath : " + mImagePath);
+        Log.d(TAG, " imageNote : " + imageNote);
 
-        PhotoEntityBean bean = new PhotoEntityBean();
-        bean.setVisitId(mVisit_id);
-        bean.setPath(mImagePath);
-        bean.setTag(tags);
+        PhotoEntityBean photo = new PhotoEntityBean();
+        photo.setVisitId(mVisitId);
+        photo.setPath(mImagePath);
+        photo.setComment(imageNote);
+        photo.setTag(tags);
 
         PhotoDAO dao = PhotoDAO.getSingletonInstance(this);
-        long photoRowId = dao.insert(bean);
+        long photoRowId = dao.insert(photo);
         Log.v(TAG, " insert id : " + photoRowId);
         if (photoRowId > 0) {
-//            Log.v(TAG, " return back.... ");
-//            Intent returnIntent = new Intent();
-//            returnIntent.putExtra("photoRowId", photoRowId);
-//            setResult(RESULT_OK, returnIntent);
-//
-            Log.v(TAG, " return back.... ");
-//            ZenForceApplication.getInstance().getCallback().photoInserted(photoRowId);
+
+
+            Util.sPhoto_count ++;
+            VisitDAO visitDAO = VisitDAO.getSingletonInstance(this);
+            VisitBean bean = new VisitBean();
+
+            Log.d(TAG, " Util.sPhoto_count : " + Util.sPhoto_count);
+            Log.d(TAG, " photoRowId : " + photoRowId);
+
+            bean.setImagePath(mImagePath);
+            bean.setImageCount(Util.sPhoto_count);
+            bean.setPhotoId(photoRowId);
+
+            String selection = DbConstants.VisitTable.COLUMN_ID + " =?";
+            String[] selectionArgs = new String[] { String.valueOf(mVisitId) };
+
+            long id = visitDAO.update(bean, selection, selectionArgs);
+
+            Log.d(TAG, " visit table updated id : " + id);
+            Intent intent = new Intent();
+            intent.putExtra("imagePath", mImagePath);
+            setResult(Activity.RESULT_OK, intent);
             finish();
 
         } else {
@@ -335,6 +356,7 @@ public class PhotoActivity extends AppCompatActivity implements OnChipClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_UNDEFINED);
 

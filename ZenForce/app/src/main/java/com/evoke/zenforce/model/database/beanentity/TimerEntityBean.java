@@ -1,12 +1,15 @@
+/*
 package com.evoke.zenforce.model.database.beanentity;
 
 import android.content.ContentValues;
 
 import com.evoke.zenforce.model.database.DbConstants;
 
+*/
 /**
  * Created by spinninti on 11/29/2016.
- */
+ *//*
+
 public class TimerEntityBean extends BaseEntityBean {
 
 
@@ -37,7 +40,7 @@ public class TimerEntityBean extends BaseEntityBean {
     }
 
 
-    public long getVisitId() {
+    public long getPlaceId() {
         return values.getAsInteger(DbConstants.TimerTable.COLUMN_VISIT_ID);
     }
 
@@ -87,3 +90,4 @@ public class TimerEntityBean extends BaseEntityBean {
         return values;
     }
 }
+*/

@@ -33,8 +33,8 @@ import android.widget.Filterable;
 import android.widget.Toast;
 
 import com.evoke.zenforce.R;
-import com.evoke.zenforce.model.database.beanentity.VisitBean;
-import com.evoke.zenforce.model.database.dao.VisitDAO;
+import com.evoke.zenforce.model.database.beanentity.PlaceBean;
+import com.evoke.zenforce.model.database.dao.PlaceDAO;
 import com.evoke.zenforce.model.pojo.autocomplete.Prediction;
 import com.evoke.zenforce.model.pojo.placedetails.Place;
 import com.evoke.zenforce.model.pojo.placedetails.Result;
@@ -66,7 +66,7 @@ public class PlaceMapActivity extends AppCompatActivity implements
 
     private static final String TAG = "PlaceMapActivity";
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 123;
-    LocationRequest mLocationRequest;
+//    LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
 
     LatLng latLng;
@@ -77,7 +77,6 @@ public class PlaceMapActivity extends AppCompatActivity implements
 
     private Double mLat;
     private Double mLng;
-//    private CollapsingToolbarLayout collapsingToolbarLayout;
 
 
     private EditText etName;
@@ -86,7 +85,7 @@ public class PlaceMapActivity extends AppCompatActivity implements
     private EditText etWebsite;
 
 
-    private VisitBean mVisitBean;
+    private PlaceBean mPlace;
 
     ArrayList<String> placeIdList;
 
@@ -96,7 +95,6 @@ public class PlaceMapActivity extends AppCompatActivity implements
     private Location mLastLocation;
     private Location mCurrentLocation;
 
-//    private  Result mSelectedPlace;
 
     private com.evoke.zenforce.model.pojo.placedetails.Location mPlaceLocation = null;
 
@@ -119,15 +117,9 @@ public class PlaceMapActivity extends AppCompatActivity implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        getSupportActionBar().setTitle("New Place");
+        getSupportActionBar().setTitle("Add Place");
 
 
         etName = (EditText) findViewById(R.id.etName);
@@ -142,7 +134,13 @@ public class PlaceMapActivity extends AppCompatActivity implements
 
     @Override
     protected void onStart() {
-        mGoogleApiClient.connect();
+        Log.d(TAG, " onStart  is LocationEnabled :" + Util.isLocationServicesEnabled());
+        if (Util.isLocationServicesEnabled()) {
+            mGoogleApiClient.connect();
+        } else {
+            showLocationEnableDialog();
+        }
+
         super.onStart();
 
 
@@ -178,31 +176,30 @@ public class PlaceMapActivity extends AppCompatActivity implements
                     updateMapDelay(location); // TODO : mGoogleApiClient is connected
                 }
 
-                mVisitBean = getLocationBean(place);
+                mPlace = createPlaceBean(place);
 
             } else {
                 Log.e(TAG, "No placeId found...");
-//                showSnackBar("PlaceId not found...");
             }
         }
     }
 
 
-    private VisitBean getLocationBean(Result place) {
+    private PlaceBean createPlaceBean(Result place) {
 
-        VisitBean bean = new VisitBean();
+        PlaceBean bean = new PlaceBean();
 
+        bean.setPlaceId(place.getPlaceId());
         bean.setName(place.getName());
         bean.setAddress(place.getFormattedAddress());
         bean.setPhone(place.getInternationalPhoneNumber());
         bean.setWebsite(place.getWebsite());
-        bean.setLocationId(place.getPlaceId());
 
 
         com.evoke.zenforce.model.pojo.placedetails.Location location = place.getGeometry().getLocation();
 
-        bean.setLocationLat(location.getLat()+"");
-        bean.setLocationLng(location.getLng()+"");
+        bean.setLat(location.getLat()+"");
+        bean.setLng(location.getLng()+"");
 
 
         Log.d(TAG, " map url : " + place.getWebsite());
@@ -284,27 +281,30 @@ public class PlaceMapActivity extends AppCompatActivity implements
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.v(TAG, "mVisitBean : " + mVisitBean);
+                Log.v(TAG, "mPlace : " + mPlace);
 
-                if (mVisitBean == null) {  // Case :  User manually entered details
+                if (mPlace == null) {  // Case :  User manually entered details
 
-                    mVisitBean = new VisitBean();
-                    mVisitBean.setName(etName.getText().toString());
-                    mVisitBean.setAddress(actAddress.getText().toString());
-                    mVisitBean.setPhone(etPhone.getText().toString());
-                    mVisitBean.setWebsite(etWebsite.getText().toString());
+                    mPlace = new PlaceBean();
+                    mPlace.setName(etName.getText().toString());
+                    mPlace.setAddress(actAddress.getText().toString());
+                    mPlace.setPhone(etPhone.getText().toString());
+                    mPlace.setWebsite(etWebsite.getText().toString());
 
                 }
 
-                VisitDAO dao = VisitDAO.getSingletonInstance(PlaceMapActivity.this);
-                long visitId = dao.insert(mVisitBean);
-                Log.v(TAG, " inserted visitId : " + visitId);
-                if (visitId > 0) {
+
+                Log.v(TAG, " inserted time :  " + System.currentTimeMillis());
+                mPlace.setTimeStamp(System.currentTimeMillis());
+                PlaceDAO dao = PlaceDAO.getSingletonInstance(PlaceMapActivity.this);
+                long placeId = dao.insert(mPlace);
+                Log.v(TAG, " inserted placeId : " + placeId);
+                if (placeId > 0) {
 //                    Toast.makeText(PlaceMapActivity.this, "Successfully added place", Toast.LENGTH_LONG).show();
-                    Log.v(TAG, " insertion success set visitId : "+visitId);
-                    mVisitBean.set_ID(visitId);
+                    Log.v(TAG, " insertion success set placeId : "+placeId);
+                    mPlace.set_ID(placeId);
                     Intent intent = new Intent(PlaceMapActivity.this, VisitActivity.class);
-                    intent.putExtra("visitBean", mVisitBean);
+                    intent.putExtra("placeBean", mPlace);
 //                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
                     finish();
@@ -395,12 +395,15 @@ public class PlaceMapActivity extends AppCompatActivity implements
         if (currentApiVersion > android.os.Build.VERSION_CODES.LOLLIPOP){
             // Do something for lollipop and above versions
 
-            Log.v(TAG, " Marshmallow......");
+            Log.d(TAG, " Marshmallow......");
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
+
+                Log.d(TAG, " requestPermissions......");
                 ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
                         PERMISSION_ACCESS_COARSE_LOCATION);
+
             }
 
 
@@ -408,7 +411,7 @@ public class PlaceMapActivity extends AppCompatActivity implements
         } else{
             // do something for phones running an SDK before lollipop
 
-            Log.v(TAG, " lollipop......");
+            Log.d(TAG, " lollipop......");
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -422,15 +425,17 @@ public class PlaceMapActivity extends AppCompatActivity implements
                 return;
             }
 
-            createLocationRequest();
-            startLocationUpdates();
+//            createLocationRequest();
+//            startLocationUpdates();
 
         }
 
 
+        createLocationRequest();
+        startLocationUpdates();
 
-
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        /*mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Log.d(TAG, " mLastLocation : " + mLastLocation);
         if (mLastLocation != null) {
             //mSelectedPlace marker at current position
             //mGoogleMap.clear();
@@ -438,31 +443,11 @@ public class PlaceMapActivity extends AppCompatActivity implements
             mLat = mLastLocation.getLatitude();
             mLng = mLastLocation.getLongitude();
 
-            Log.v(TAG, " Lat : " + mLastLocation.getLatitude() + " Long : " + mLastLocation.getLongitude());
+            Log.e(TAG, " Lat : " + mLastLocation.getLatitude() + " Long : " + mLastLocation.getLongitude());
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-
-//            createLocationRequest();
-//            startLocationUpdates();
-
             updateMapLocation(latLng);
-
-
-
-            /*MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title("Current Position");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            mMarker = mGoogleMap.addMarker(markerOptions);*/
-        }
-//        mLocationRequest = new LocationRequest();
-//        mLocationRequest.setInterval(10000); //5 seconds
-//        mLocationRequest.setFastestInterval(5000); //3 seconds
-//        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-        //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
-
-//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }*/
     }
 
 
@@ -472,8 +457,10 @@ public class PlaceMapActivity extends AppCompatActivity implements
             case PERMISSION_ACCESS_COARSE_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // All good!
+                    Log.e(TAG, " All good.....");
                     createLocationRequest();
                     startLocationUpdates();
+
                 } else {
                     Toast.makeText(this, "Need your location!", Toast.LENGTH_SHORT).show();
                 }
@@ -482,11 +469,14 @@ public class PlaceMapActivity extends AppCompatActivity implements
         }
     }
 
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000); // 10 sec
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    protected LocationRequest createLocationRequest() {
+
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000); // 10 sec
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        return locationRequest;
     }
 
 
@@ -503,7 +493,8 @@ public class PlaceMapActivity extends AppCompatActivity implements
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        Log.d(TAG, " startLocationUpdates.....");
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, createLocationRequest(), this);
     }
 
     @Override
@@ -522,6 +513,8 @@ public class PlaceMapActivity extends AppCompatActivity implements
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         Log.v(TAG, "onLocationChanged....");
+        mLat = location.getLatitude();
+        mLng = location.getLongitude();
         latLng = new LatLng(location.getLatitude(), location.getLongitude());
         updateMapLocation(latLng);
 
@@ -598,7 +591,7 @@ public class PlaceMapActivity extends AppCompatActivity implements
         etWebsite.setText(result.getWebsite());
 
 
-        mVisitBean = getLocationBean(result);
+        mPlace = createPlaceBean(result);
 
         /*if (mMarker != null) {
             mMarker.remove();

@@ -9,12 +9,46 @@
         android:id="@+id/appbar"
         layout="@layout/app_bar"></include>
 
-    <EditText
-        android:id="@+id/etNote"
-        android:layout_below="@+id/appbar"
+    <!-- <EditText
+         android:id="@+id/etNote"
+         android:layout_below="@+id/appbar"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:hint="Enter note here.."
+         android:inputType="text" />-->
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter note here.."
-        android:inputType="text" />
+        android:layout_below="@+id/appbar"
+        android:layout_marginTop="4dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <TextView
+                android:id="@+id/tvNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="* Add Note"
+                android:textColor="@color/launch_primary"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etNote"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_below="@+id/tvNotes"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/custom_edittext" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
 </RelativeLayout>

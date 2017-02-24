@@ -41,4 +41,12 @@
     <string name="enable_location">Enable Location</string>
     <string name="location_settings">Location settings</string>
     <string name="enable_location_msg">Your Location Settings is set to Off.Please Enable Location to use this app</string>
+
+
+    <string-array name="positions_array">
+        <item>Top</item>
+        <item>Middle</item>
+        <item>Bottom</item>
+    </string-array>
+
 </resources>

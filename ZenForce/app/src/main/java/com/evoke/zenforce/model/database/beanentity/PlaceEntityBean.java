@@ -58,7 +58,7 @@ public class PlaceEntityBean extends  BaseEntityBean{
         mContentValues.put(PlaceTable.COLUMN_NAME, name);
     }
 
-    public String getAddress() {
+    public String getPlaceAddress() {
         return mContentValues.getAsString(PlaceTable.COLUMN_ADDRESS);
     }
 

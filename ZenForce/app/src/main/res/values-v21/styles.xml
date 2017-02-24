@@ -35,6 +35,26 @@
 
     </style>
 
+    <!--<style name="AppTheme.Today" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/today_primary</item>
+        <item name="android:colorPrimaryDark">@color/today_primary_dark</item>
+        <item name="android:colorAccent">@color/today_accent</item>
+        <item name="android:textColorPrimary">@color/today_primary_text</item>
+        <item name="android:textColorSecondary">@color/today_secondary_text</item>
+        <item name="android:icon">@color/today_icons</item>
+        <item name="android:divider">@color/today_divider</item>
+
+        <item name="android:colorControlNormal">#c5c5c5</item>
+        <item name="android:colorControlActivated">@color/today_primary</item>
+        <item name="android:colorControlHighlight">@color/today_primary</item>
+
+        &lt;!&ndash; <item name="textColorPrimary">@color/launch_primary_text</item>
+         <item name="textColorSecondary">@color/launch_secondary_text</item>&ndash;&gt;
+
+        <item name="android:actionMenuTextColor">@color/white</item>
+
+    </style>-->
+
     <style name="DialogTheme" parent="android:Theme.Dialog">
 
         <item name="android:layout_width">fill_parent</item>

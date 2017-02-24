@@ -1,19 +1,24 @@
 package com.evoke.zenforce.model.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.evoke.zenforce.R;
+import com.evoke.zenforce.model.database.beanentity.BaseEntityBean;
+import com.evoke.zenforce.model.database.beanentity.NoteEntityBean;
+import com.evoke.zenforce.model.database.beanentity.PhotoEntityBean;
 
-import java.util.Iterator;
+import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by spinninti on 11/21/2016.
@@ -22,14 +27,22 @@ public class VisitedHistoryListAdapter extends RecyclerView.Adapter<VisitedHisto
 
 
     private static final String TAG = "VisitedListAdapter";
-    private List<Map<String, Integer>> mResultList;
+
+    private static final  int THUMB_SIZE = 240;
+
+    private List<List<? extends BaseEntityBean>> mResultList;
     private Context mContext;
+
+
+
+    private int photo_count = 0;
+    private int note_count = 0;
 
     String[] keys = new String[] { "PHOTO", "NOTE", "TIMER" };
 
 
 
-    public VisitedHistoryListAdapter(Context context, List<Map<String, Integer>> resultList) {
+    public VisitedHistoryListAdapter(Context context, List<List<? extends BaseEntityBean>> resultList) {
         mContext = context;
         mResultList = resultList;
     }
@@ -42,8 +55,29 @@ public class VisitedHistoryListAdapter extends RecyclerView.Adapter<VisitedHisto
 
     @Override
     public void onBindViewHolder(PlaceViewHolder holder, int position) {
-        Map<String, Integer> map = mResultList.get(position);
-        holder.bindView(map);
+        List<? extends BaseEntityBean> list = mResultList.get(position);
+        Log.d(TAG, " mResultList size : " + list.size());
+
+
+        for (BaseEntityBean base : list) {
+
+            if (base instanceof PhotoEntityBean) {
+
+                while (photo_count < list.size()) {
+                    photo_count++;
+                }
+                Log.d(TAG, " photo_count : " + photo_count);
+                holder.photoBindView((PhotoEntityBean) base);
+            } else if (base instanceof NoteEntityBean) {
+
+                while (note_count < list.size()) {
+                    note_count++;
+                }
+                Log.d(TAG, " note_count : " + note_count);
+                holder.noteBindView((NoteEntityBean) base);
+            }
+
+        }
     }
 
     @Override
@@ -54,68 +88,42 @@ public class VisitedHistoryListAdapter extends RecyclerView.Adapter<VisitedHisto
     public class PlaceViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvDate;
-        TextView tvImageNumber;
-        TextView tvNotesNumber;
-        TextView tvVisitNumber;
+
+        ImageView photoImg;
+        TextView photoCount;
+//        TextView tvNotesNumber;
+//        TextView tvVisitNumber;
 
         public PlaceViewHolder(View itemView) {
             super(itemView);
             tvDate = (TextView) itemView.findViewById (R.id.tvDate);
-            tvImageNumber = (TextView) itemView.findViewById (R.id.tvImageNumber);
-            tvNotesNumber = (TextView) itemView.findViewById (R.id.tvNotesNumber);
-            tvVisitNumber = (TextView) itemView.findViewById (R.id.tvVisitNumber);
+            photoImg = (ImageView) itemView.findViewById (R.id.photoImg);
+            photoCount = (TextView) itemView.findViewById (R.id.photoCount);
+//            tvImageNumber = (TextView) itemView.findViewById (R.id.tvImageNumber);
+//            tvNotesNumber = (TextView) itemView.findViewById (R.id.tvNotesNumber);
+//            tvVisitNumber = (TextView) itemView.findViewById (R.id.tvVisitNumber);
 
         }
-        public void bindView(Map<String, Integer> map) {
+        public void photoBindView(PhotoEntityBean photo) {
 
-            if (map == null) return;
+                Log.d(TAG, " photo_count : " + photo_count);
+                Log.d(TAG, " photo path : " + photo.getPath());
 
-            Set<String> keys = map.keySet();
+            photoCount.setText(photo_count+"");
 
-            Iterator<String> iterator = keys.iterator();
-
-            while (iterator.hasNext()) {
-
-                String key = iterator.next();
-
-                if ("PHOTO".equals(key)) {
-
-                    Log.v(TAG, " photo count : " + map.get(key));
-                    tvImageNumber.setVisibility(View.VISIBLE);
-                    tvImageNumber.setText(map.get(key) +"");
-
-                } else if ("NOTE".equals(key)) {
-
-                    Log.v(TAG, " note count : " + map.get(key));
-                    tvNotesNumber.setVisibility(View.VISIBLE);
-                    tvNotesNumber.setText(map.get(key) +"");
-
-                } else if ("TIMER".equals(key)) {
-
-                    Log.v(TAG, " visit count : " + map.get(key));
-                    tvVisitNumber.setVisibility(View.VISIBLE);
-                    tvVisitNumber.setText(map.get(key) +"");
+                File imgFile = new File(photo.getPath().toString());
+                if(imgFile.exists()){
+                    Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()),
+                            THUMB_SIZE, THUMB_SIZE);
+                    Log.d(TAG, "ThumbImage :  " + ThumbImage);
+                    photoImg.setImageBitmap(ThumbImage);
 
                 }
+        }
+
+        public void noteBindView(NoteEntityBean note) {
 
 
-            }
-
-
-
-
-
-//            placeName.setText(photo.getPath());
-           /* mItemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.v(TAG, " call VisitActivity...." );
-                    Intent myPlacesIntent = new Intent(mContext, VisitActivity.class);
-                    myPlacesIntent.putExtra("visitBean", visit);
-                    myPlacesIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    mContext.startActivity(myPlacesIntent);
-                }
-            });*/
         }
 
 
