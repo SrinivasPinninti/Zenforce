@@ -5,9 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,7 +35,6 @@ import com.evoke.zenforce.view.chip.OnChipClickListener;
 import com.evoke.zenforce.view.chip.Tag;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -232,7 +228,7 @@ public class PhotoActivity extends AppCompatActivity implements  OnChipClickList
     private void previewCapturedImage() {
         try {
 
-            Bitmap bitmap1 = getCameraPhotoOrientation(mImagePath);
+            Bitmap bitmap1 = Util.getScaledImage(mImagePath);
             imageView.setImageBitmap(bitmap1);
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -263,11 +259,18 @@ public class PhotoActivity extends AppCompatActivity implements  OnChipClickList
     private void savePhoto() {
 
         StringBuilder sb = new StringBuilder();
-        for (Chip tag : mTagList1) {
-           if (tag.getType() == 1) {
-               sb.append("#" + tag.getText() + ", ");
-           }
+
+        int size = mTagList1.size();
+
+        for (int i=0; i<size; i++) {
+            Chip tag = mTagList1.get(i);
+            if (tag.getType() == 1) {
+                sb.append("#" + tag.getText());
+                if (++i < size) sb.append( ", ");
+            }
+
         }
+
         String tags = sb.length() > 0 ? sb.substring(0, sb.length() - 1): "";
 
         String imageNote = etImageNote.getText().toString().trim();
@@ -349,68 +352,5 @@ public class PhotoActivity extends AppCompatActivity implements  OnChipClickList
 
 
 
-    public Bitmap getCameraPhotoOrientation(String imagePath){
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(imagePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_UNDEFINED);
-
-        // bimatp factory
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        // downsizing image as it throws OutOfMemory Exception for larger
-        // images
-        options.inSampleSize = 8;
-        final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-        Bitmap bmRotated = rotateBitmap(bitmap, orientation);
-        return bmRotated;
-    }
-
-    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
-
-        Matrix matrix = new Matrix();
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_NORMAL:
-                return bitmap;
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                matrix.setScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.setRotate(180);
-                break;
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                matrix.setRotate(180);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_TRANSPOSE:
-                matrix.setRotate(90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.setRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_TRANSVERSE:
-                matrix.setRotate(-90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.setRotate(-90);
-                break;
-            default:
-                return bitmap;
-        }
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            bitmap.recycle();
-            return bmRotated;
-        }
-        catch (OutOfMemoryError e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

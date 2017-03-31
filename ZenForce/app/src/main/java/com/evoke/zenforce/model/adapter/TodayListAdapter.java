@@ -127,10 +127,7 @@ public class TodayListAdapter extends RecyclerView.Adapter<TodayListAdapter.Plac
                         rl_image.setVisibility(View.VISIBLE);
                     }
 
-                    Picasso.with(mContext)
-                            .load(Uri.fromFile(imgFile))
-                            .placeholder(R.drawable.placeholder)
-                            .into(imageView);
+                    Picasso.with(mContext).load(Uri.fromFile(imgFile)).fit().centerCrop().into(imageView);
 
                     rl_image.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -164,7 +161,15 @@ public class TodayListAdapter extends RecyclerView.Adapter<TodayListAdapter.Plac
                 }
 
                 tvNotes.setText(notes);
-                today_note_count.setText(visit.getNoteCount() + " notes");
+
+                int count = visit.getNoteCount();
+
+                if (count > 1) {
+                    today_note_count.setVisibility(View.VISIBLE);
+                    today_note_count.setText(count+" notes");
+                } else {
+                    today_note_count.setVisibility(View.INVISIBLE);
+                }
 
                 rl_note.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -181,10 +186,6 @@ public class TodayListAdapter extends RecyclerView.Adapter<TodayListAdapter.Plac
                 Log.e(TAG, " notes not available.....");
                 rl_note.setVisibility(View.GONE);
             }
-
-
-
-
 
         }
 

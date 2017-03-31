@@ -20,14 +20,14 @@
         android:layout_height="50dp"
         android:src="@drawable/chat_image2" />
 
-        <ImageView
+       <!-- <ImageView
             android:id="@+id/imgResult"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/not_sent_48"
             android:layout_marginTop="12dp"
             android:layout_centerInParent="true"
-            android:layout_below="@+id/imgChat"/>
+            android:layout_below="@+id/imgChat"/>-->
 
     </RelativeLayout>
 

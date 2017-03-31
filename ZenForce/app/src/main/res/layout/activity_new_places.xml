@@ -270,7 +270,8 @@
                                 android:layout_height="60dp"
                                 android:singleLine="true"
                                 android:textColor="@android:color/black"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                android:inputType="phone"/>
 
                         </LinearLayout>
 

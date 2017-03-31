@@ -355,7 +355,8 @@ public class VisitActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         Log.e(TAG, "onBackPressed check : " + check);
-        switch (check) {
+        activitiesFragment.onBackPressed();
+        /*switch (check) {
             case 0:
                 activitiesFragment.onBackPressed();
                 break;
@@ -363,7 +364,7 @@ public class VisitActivity extends AppCompatActivity implements
             case 2:
                finish();
                 break;
-        }
+        }*/
     }
 
     @Override

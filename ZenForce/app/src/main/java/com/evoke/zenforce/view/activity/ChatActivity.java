@@ -25,21 +25,17 @@ import android.widget.ListView;
 
 import com.evoke.zenforce.R;
 import com.evoke.zenforce.model.adapter.ChatAdapter;
-import com.evoke.zenforce.model.database.DbConstants;
-import com.evoke.zenforce.model.database.beanentity.MessageEntityBean;
-import com.evoke.zenforce.model.database.dao.MessageDAO;
 import com.evoke.zenforce.model.pojo.ChatMessage;
 import com.evoke.zenforce.utility.Constants;
 import com.evoke.zenforce.utility.PubnubKeys;
 import com.evoke.zenforce.utility.Util;
-import com.evoke.zenforce.view.presenter.PublishMessage;
 import com.evoke.zenforce.view.service.PubNubService;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,6 +49,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT_SPEECH = 200;
 
 
+//    String name1= "Brayden";
+//    String name_female= "Sophia";
+
+
+
 
     ArrayList<ChatMessage> chatMessageList;
     ChatAdapter chatAdapter;
@@ -63,18 +64,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton uiFabSpk;
     private boolean mSend;
 
-    private PublishMessage publishMessage;
+
+//    private String itemID = null;
+
+
 
     Gson gson;
+    JSONObject messageObject;
 
-    private boolean mServiceBound = false;
-    private boolean isSelf = false;
 
     Pubnub pubnub = new Pubnub(PubnubKeys.PUBLISH_KEY, PubnubKeys.SUBSCRIBE_KEY);
+
+    private long mPhotoId;
 
 
     private PubNubService mService = null;
 
+    private boolean mServiceBound = false;
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -100,13 +106,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+
+            mPhotoId = (long) bundle.get("photoId");
+        }
         initUI();
         gson = new Gson();
-
     }
 
     private void initUI() {
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -132,7 +140,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         Intent intent = new Intent(this, PubNubService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
-
         Log.d(TAG, " history CHANNEL_NAME : " + PubnubKeys.CHANNEL_NAME);
 
         pubnub.history(PubnubKeys.CHANNEL_NAME, 10, false, new Callback() {
@@ -154,11 +161,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void populateHistory(Object message) {
+        JSONArray mainObj = null;
+        try {
+            JSONArray jsonArray = new JSONArray(message.toString());
 
-        ArrayList<ChatMessage> chatMessages= (ArrayList<ChatMessage>) gson.fromJson(message.toString(),
-                new TypeToken<ArrayList<ChatMessage>>() {}.getType());
+            if (jsonArray != null && jsonArray.length() > 0) {
 
-        chatMessageList.addAll(chatMessages);
+                mainObj = (JSONArray) jsonArray.get(0);
+
+                int length = mainObj.length();
+
+
+                for (int i = 0; i < length; i++) {
+                    JSONObject json = (JSONObject) mainObj.get(i);
+                    ChatMessage chatMessage = gson.fromJson(json.toString(), ChatMessage.class);
+                    chatMessageList.add(chatMessage);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
 
         runOnUiThread(new Runnable() {
             @Override
@@ -170,13 +196,42 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
     public void populateMessage(ChatMessage chatMessages) {
         Log.d(TAG, " populateMessage messages.....");
 //            JSONObject json = new JSONObject(message.toString());
 //            Log.d(TAG, "Received msg : " + message.toString());
 
-            chatMessageList.add(chatMessages);
+        chatMessageList.add(chatMessages);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, " update chat history list from UI thread....");
+                chatAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
+    /*private void populateHistory(Object message) {
+
+        try {
+            JSONArray array = new JSONArray(message.toString());
+            JSONArray msgArray = (JSONArray) array.get(0);
+
+            int length = msgArray.length();
+
+            for (int i = 0; i < length; i++) {
+
+                JSONObject json = (JSONObject) msgArray.get(i);
+
+                String user = json.getString("username");
+                String chatMsg = json.getString("message");
+                String time = json.getString("time");
+                boolean isSelf = json.getBoolean("isSelf");
+                ChatMessage chat = new ChatMessage(user, chatMsg, isSelf, time);
+                chatMessageList.add(chat);
+            }
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -184,13 +239,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     chatAdapter.notifyDataSetChanged();
                 }
             });
-    }
+
+
+        } catch (Exception e) {
+            Log.e(TAG, "Exception.......");
+            e.printStackTrace();
+        }
+
+    }*/
+
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(chatReceiver, new IntentFilter(Constants.BROADCAST_ACTION_RECEIVED_MSG));
-//        registerReceiver(offlineMsgReceiver, new IntentFilter(Constants.BROADCAST_ACTION_OFFLINE_MSG));
     }
 
 
@@ -198,7 +260,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPause() {
         super.onPause();
         unregisterReceiver(chatReceiver);
-//        unregisterReceiver(offlineMsgReceiver);
     }
 
 
@@ -234,9 +295,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     uiETMessage.setText("");
 
                     if (message != null && !message.isEmpty()) {
-
-                        ChatMessage chatMessage = new ChatMessage(Util.USER, message, Util.getCurrentTime());
+                        ChatMessage chatMessage = new ChatMessage(mPhotoId, Util.USER, message, Util.getCurrentTime());
                         String chatMsg = gson.toJson(chatMessage);
+//                        message = gson.toJson(new ChatMessage(Util.USER, message, true, Util.getCurrentTime()));
+
                         JSONObject jsonMessage = null;
                         try {
                             jsonMessage = new JSONObject(chatMsg);
@@ -244,6 +306,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             Log.e(TAG, je.toString());
                         }
                         uiETMessage.setText("");
+                        /*SendMessagePresenter presenter = new SendMessagePresenter();
+                        presenter.sendMessage(message, new IMessageCallback() {
+                            @Override
+                            public void onSuccessCallback(ChatMessage chatMessage) {
+                                chatMessageList.add(chatMessage);
+                                Log.d(TAG, " update chat list.....");
+                                chatAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onErrorCallback() {
+                                Log.d("errorCallback", "error..... ");
+                            }
+                        });*/
 
                         Log.d(TAG, " publish CHANNEL_NAME : " + PubnubKeys.CHANNEL_NAME);
 
@@ -251,20 +327,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void successCallback(String channel, Object message) {
                                 super.successCallback(channel, message);
-                                Log.d("successCallback", "## success : " + message.toString());
-//                                isSelf = true;
-//                                ChatMessage chatMessage = gson.fromJson(message.toString(), ChatMessage.class);
-
-
-//                                Type listType = new TypeToken<List<ChatMessage>>() { }.getType();
-//                                List<ChatMessage> chatMessages = new Gson().fromJson(message.toString(), listType);
-//                                populateMessage(chatMessages);
+                                Log.d("successCallback", "message " + message.toString());
+//                                ChatMessage chat = populateMessage(message);
+//                                chatMessageList.add(chat);
+//                                Log.d(TAG, " update chat list.....");
+//                                chatAdapter.notifyDataSetChanged();
                             }
 
                             @Override
                             public void errorCallback(String channel, PubnubError error) {
                                 super.errorCallback(channel, error);
-                                Log.e("errorCallback", "## error : " + error.toString());
+                                Log.e("errorCallback", "error " + error);
                             }
 
                         });
@@ -283,7 +356,35 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 break;
+            /*case R.id.btnSend:
+                String message = chatMessage.getText().toString().trim();
+                if (message.length() != 0) {
+                    message = gson.toJson(new ChatMessage(USER, message, true, Util.getCurrentTime()));
 
+                    try {
+                        messageObject = new JSONObject(message);
+                    } catch (JSONException je) {
+                        Log.d(TAG, je.toString());
+                    }
+                    chatMessage.setText("");
+                    pubnub.publish(PubnubKeys.CHANNEL_NAME, messageObject, new Callback() {
+                        @Override
+                        public void successCallback(String channel, Object message) {
+                            super.successCallback(channel, message);
+                            Log.d("successCallback", "message " + message);
+                        }
+
+                        @Override
+                        public void errorCallback(String channel, PubnubError error) {
+                            super.errorCallback(channel, error);
+                            Log.d("errorCallback", "error " + error);
+                        }
+
+                    });
+                } else {
+                    Toast.makeText(this, "Please enter message", Toast.LENGTH_SHORT).show();
+                }
+                break;*/
         }
     }
 
@@ -305,6 +406,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    /*public ChatMessage populateMessage(Object message) {
+
+        ChatMessage msgObj = null;
+        try {
+            JSONObject json = new JSONObject(message.toString());
+
+            String user = json.getString("username");
+            String chatMsg = json.getString("message");
+            String time = json.getString("time");
+            boolean isSelf = json.getBoolean("isSelf");
+
+            Log.d(TAG, "Received msg : " + message.toString());
+            msgObj = new ChatMessage(user, chatMsg, isSelf, time);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Exception.......");
+            e.printStackTrace();
+        }
+
+        return msgObj;
+    }*/
+
     public BroadcastReceiver chatReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -314,46 +437,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (intent != null) {
                 Bundle bundle = intent.getExtras();
                 ChatMessage chat = (ChatMessage) bundle.get("ChatMessage");
-                Log.d(TAG, " populateMessage chat list.....");
-                populateMessage(chat);
-
+                chatMessageList.add(chat);
+                Log.d(TAG, " update chat list.....");
+                chatAdapter.notifyDataSetChanged();
             }
         }
     };
-
-
-   /* public BroadcastReceiver offlineMsgReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Log.d(TAG, " offlineMsgReceiver invoked.....");
-
-            if (intent != null) {
-                Bundle bundle = intent.getExtras();
-                List<MessageEntityBean> offline_messages = bundle.getParcelableArrayList("Offline_messages");
-                for(MessageEntityBean msg : offline_messages) {
-                    Log.d(TAG, " populate offline messages.....");
-                    populateMessage(msg);
-                    updateMessageStatus(msg);
-                }
-            }
-        }
-    };*/
-
-
-    private void updateMessageStatus(MessageEntityBean msg) {
-
-        Log.d(TAG, " updateMessageStatus offline messages.....");
-
-        MessageDAO dao = MessageDAO.getSingletonInstance(this);
-
-        String selection = DbConstants.MessageTable.COLUMN_IS_SENT + " =?";
-        String[] selectionArgs = new String[] { "0" };
-
-        msg.setIsSent(1);
-        dao.update(msg, selection, selectionArgs);
-
-    }
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -377,16 +466,4 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
-   /* private void updateChatList(MessageEntityBean bean) {
-        Log.d(TAG, "updateChatList......");
-        chatMessageList.add(bean);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, " update chat history list from UI thread....");
-                chatAdapter.notifyDataSetChanged();
-            }
-        });
-    }*/
 }

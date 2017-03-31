@@ -7,13 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.evoke.zenforce.R;
 import com.evoke.zenforce.model.pojo.ChatMessage;
 
 import java.util.List;
+
+/**
+ *sriniva
+ */
 
 public class ChatAdapter extends BaseAdapter {
 
@@ -56,7 +59,7 @@ public class ChatAdapter extends BaseAdapter {
 
 
         if (msg.getUsername().equals("Manager")) {
-            // message belongs to you, so load the right aligned layout
+            // message belongs to Manager, so load the right aligned layout
             convertView = mInflater.inflate(R.layout.chat_right,  null);
         } else {
             // message belongs to other person, load the left aligned layout
@@ -66,14 +69,8 @@ public class ChatAdapter extends BaseAdapter {
 //        TextView lblFrom = (TextView) convertView.findViewById(R.id.lblMsgFrom);
         TextView  txtMsg        = (TextView) convertView.findViewById(R.id.txtMsg);
         TextView  timeStamp     = (TextView) convertView.findViewById(R.id.timeStamp);
-        ImageView imgResult     = (ImageView) convertView.findViewById(R.id.imgResult);
+//        ImageView imgResult     = (ImageView) convertView.findViewById(R.id.imgResult);
 
-        // Identifying the message sent/failed
-       /* if (messagesItems.get(position).getIsSent() == 1) {  // Message Sent Successfully
-            imgResult.setImageResource(R.drawable.sent_48);
-        } else {  // Failed to send Message
-            imgResult.setImageResource(R.drawable.not_sent_48);
-        }*/
 
         txtMsg.setText(msg.getMessage());
         timeStamp.setText(msg.getTime());

@@ -556,8 +556,16 @@ public class ActivitiesFragment extends Fragment implements View.OnClickListener
     }
 
     public void onBackPressed() {
-        Log.e(TAG, " Back key pressed...");
-        finishVisitDialog();
+        Log.e(TAG, " Back key pressed is timer running : " + timerService.isTimerRunning());
+        if (timerService.isTimerRunning()) {
+            finishVisitDialog();
+        } else {
+
+            Intent intent = new Intent(mActivity, LaunchActivity.class);
+            mActivity.startActivity(intent);
+            mActivity.finish();
+        }
+
     }
 
 

@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -27,8 +28,10 @@ import com.evoke.zenforce.R;
 import com.evoke.zenforce.model.database.DbConstants;
 import com.evoke.zenforce.model.database.beanentity.PhotoEntityBean;
 import com.evoke.zenforce.model.database.dao.PhotoDAO;
+import com.evoke.zenforce.utility.Util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,23 +209,33 @@ public class ImageActivity extends AppCompatActivity implements LoaderManager.Lo
                     File imgFile = new File(imagePath);
                     if (imgFile != null && imgFile.exists()) {
 
-
               /*  Picasso.with(getContext())
                         .load(Uri.fromFile(imgFile))
                         .placeholder(R.drawable.image_placeholder)
                         .into(imageView);*/
 
                         BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inSampleSize = 8;
+                        options.inSampleSize = 4;
                         options.inDither = false;
-                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options );
-                        imageView.setImageBitmap(bitmap);
+                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
+
+                        ExifInterface exif = null;
+                        try {
+                            exif = new ExifInterface(imagePath);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                ExifInterface.ORIENTATION_UNDEFINED);
+
                         //set to image view
-                        imageView.setImageBitmap(bitmap);
+                        imageView.setImageBitmap(Util.rotateBitmap(bitmap, orientation));
 
                     }
 
                 }
+
 
                 image_tags.setText(photo.getTag());
                 image_text.setText(photo.getComment());
@@ -231,7 +244,7 @@ public class ImageActivity extends AppCompatActivity implements LoaderManager.Lo
                     public void onClick(View v) {
 
                         Intent intent = new Intent(ImageActivity.this, ChatActivity.class);
-                        intent.putExtra("itemID" , photo.get_ID());
+                        intent.putExtra("photoId" , photo.get_ID());
                         startActivity(intent);
                     }
                 });

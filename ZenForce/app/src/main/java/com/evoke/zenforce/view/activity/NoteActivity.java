@@ -27,6 +27,7 @@ public class NoteActivity extends AppCompatActivity {
 
     private static final String TAG = "NoteActivity";
     private EditText mEditText;
+    private long mVisitId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +46,13 @@ public class NoteActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Add Note");
 
         mEditText = (EditText) findViewById(R.id.etNote);
-//        extractDataFromBundle();
-    }
-
-   /* private void extractDataFromBundle() {
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-//            mVisitId = bundle.getLong("mVisitId");
-            getSupportActionBar().setTitle(bundle.getString("visitName"));
+            mVisitId = bundle.getLong("visitId");
+            Log.d(TAG, "mVisitId : " + mVisitId);
         }
-
-    }*/
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -88,11 +84,13 @@ public class NoteActivity extends AppCompatActivity {
 
 
         Log.v(TAG, "  entered note : " + note);
-        Log.d(TAG, " sVisitId : " + Util.sVisitId);
+        Log.d(TAG, " mVisitId : " + mVisitId);
+//        Log.d(TAG, " sVisitId : " + Util.sVisitId);
 
         NoteEntityBean bean = new NoteEntityBean();
         bean.setNote(note);
-        bean.setVisitId(Util.sVisitId);
+//        bean.setVisitId(Util.sVisitId);
+        bean.setVisitId(mVisitId);
         NoteDAO dao = NoteDAO.getSingletonInstance(this);
         long noteRowId = dao.insert(bean);
         Log.d(TAG, " note inserted id " + noteRowId);
@@ -112,7 +110,7 @@ public class NoteActivity extends AppCompatActivity {
             visit.setNoteCount(Util.sNote_count);
 
             String selection = DbConstants.VisitTable.COLUMN_ID + " =?";
-            String[] selectionArgs = new String[] { String.valueOf(Util.sVisitId) };
+            String[] selectionArgs = new String[] { String.valueOf(mVisitId) };
 
             long id = visitDAO.update(visit, selection, selectionArgs);
 

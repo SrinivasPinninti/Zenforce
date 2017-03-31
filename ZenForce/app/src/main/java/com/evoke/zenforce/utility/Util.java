@@ -2,13 +2,20 @@ package com.evoke.zenforce.utility;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.evoke.zenforce.view.application.ZenForceApplication;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Util {
 
     public static final int REQUEST_TYPE_PLACE = 3;
-    public static  String USER = "Manager";
+    public static  String USER = "Employee";
 
     public static long sVisitId = 0;
 
@@ -151,6 +158,79 @@ public class Util {
         return df3.format(c.getTime());
     }
 
+
+    public static Bitmap getScaledImage(String imagePath){
+
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(imagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED);
+
+        // bimatp factory
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        // downsizing image as it throws OutOfMemory Exception for larger
+        // images
+        options.inSampleSize = 8;
+        final Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+        Bitmap bmRotated = rotateBitmap(bitmap, orientation);
+        return bmRotated;
+    }
+
+    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+        }
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+            return bmRotated;
+        }
+        catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static boolean isEmpty(TextView view) {
+
+        return TextUtils.isEmpty(view.getText().toString());
+
+    }
 
 
 }

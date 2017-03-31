@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.evoke.zenforce.R;
 import com.evoke.zenforce.model.database.beanentity.BarCodeEntityBean;
 import com.evoke.zenforce.model.database.dao.BarCodeDAO;
+import com.evoke.zenforce.utility.Util;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -493,10 +494,19 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(photoIntent, 700);
                 break;
             case R.id.tv_email:
-                slideUpDown();
-                sendEmailWithPdf(getPdfFile());
-                finish();
+
+                if (Util.isEmpty(barcode)) {
+
+                    Toast.makeText(this,  "Fields are empty!", Toast.LENGTH_SHORT).show();
+
+                } else {
+
+                    slideUpDown();
+                    sendEmailWithPdf(getPdfFile());
+//                    finish();
 //                sendEmailWithPdf(createPdf());
+
+                }
 
                 break;
             case R.id.tv_save:
@@ -504,7 +514,6 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
                 slideUpDown();
                 break;
             case R.id.tv_save_mail:
-//                sendEmailWithPdf(createPdf());
                 new DataUploadTask(this).execute();
                 slideUpDown();
                 break;
@@ -620,12 +629,13 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
             progressDialog.dismiss();
             if (s != null) {
                 Toast.makeText(context, "Report form submitted successfully.", Toast.LENGTH_LONG).show();
+                sendEmailWithPdf(getPdfFile());
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
 
             } else {
-                Toast.makeText(context, "Report form submition failed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Report form submission failed.", Toast.LENGTH_LONG).show();
             }
         }
     }

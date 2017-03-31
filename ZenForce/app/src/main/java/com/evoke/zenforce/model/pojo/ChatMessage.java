@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 public class ChatMessage implements Serializable{
 
+    @SerializedName("itemId")
+    long itemId;
     @SerializedName("username")
     String username;
     @SerializedName("message")
@@ -13,14 +15,15 @@ public class ChatMessage implements Serializable{
 //    @SerializedName("isSelf")
 //    private int isSelf;
 
-    @SerializedName("time")
-    private String time;
+    @SerializedName("timestamp")
+    private String timestamp;
 
-    public ChatMessage(String username, String message, String time) {
+    public ChatMessage(long itemId, String username, String message, String timestamp) {
+        this.itemId = itemId;
         this.username = username;
         this.message = message;
 //        this.isSelf = isSelf;
-        this.time = time;
+        this.timestamp = timestamp;
     }
 
     public String getUsername() {
@@ -40,6 +43,6 @@ public class ChatMessage implements Serializable{
     }*/
 
     public String getTime() {
-        return time;
+        return timestamp;
     }
 }

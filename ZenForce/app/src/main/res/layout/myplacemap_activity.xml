@@ -167,6 +167,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:hint="Phone"
+                    android:inputType="phone"
                     android:singleLine="true"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />

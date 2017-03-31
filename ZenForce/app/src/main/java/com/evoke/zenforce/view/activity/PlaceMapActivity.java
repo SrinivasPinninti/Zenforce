@@ -336,6 +336,8 @@ public class PlaceMapActivity extends AppCompatActivity implements
         mUiSettings = mGoogleMap.getUiSettings();
         mUiSettings.setZoomControlsEnabled(true);
 
+        mGoogleMap.setMyLocationEnabled(true);
+
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
